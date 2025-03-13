@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LAN Messenger</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background-color: #f5f5f5;
+    }
+    /* Add drag-and-drop styles */
+    .body-dragover {
+      background-color: rgba(52, 152, 219, 0.1);
+      outline: 2px dashed #3498db;
+      outline-offset: -10px;
+      position: relative;
+    }
+    body.body-dragover:before {
+      content: '';
+      position: fixed;
+      background-color: #4242424d;
+      inset: 10px;
+      z-index: 9;
+    }
+    .body-dragover::after {
+      content: 'Drop file to upload';
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.5rem;
+      color: #000000;
+      pointer-events: none;
+    }
+    .login-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .login-form {
+      background-color: white;
+      padding: 30px;
+      border-radius: 8px;
+      width: 300px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .login-form h2 {
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+    .login-form input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    .login-form button {
+      width: 100%;
+      padding: 12px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+    .login-form button:hover {
+      background-color: #2980b9;
+    }
+    .container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    .sidebar {
+      width: 250px;
+      background-color: #2c3e50;
+      color: white;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar h2 {
+      margin-bottom: 15px;
+      font-size: 1.2rem;
+      color: #ecf0f1;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #34495e;
+    }
+    .users-list {
+      flex: 1;
+      overflow-y: auto;
+    }
+    .user-item {
+      padding: 10px;
+      border-bottom: 1px solid #34495e;
+      display: flex;
+      align-items: center;
+    }
+    .user-status {
+      width: 10px;
+      height: 10px;
+      background-color: #2ecc71;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background-color: white;
+    }
+    .chat-header {
+      padding: 15px;
+      background-color: #3498db;
+      color: white;
+      border-bottom: 1px solid #2980b9;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .chat-header h2 {
+      font-size: 1.2rem;
+    }
+    .messages {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      background-color: #ecf0f1;
+      padding-bottom: 75px;
+    }
+    .message {
+      margin-bottom: 15px;
+      padding: 10px;
+      border-radius: 8px;
+      max-width: 70%;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+    .message.received {
+      background-color: white;
+      align-self: flex-start;
+      margin-right: auto;
+    }
+    .message.sent {
+      background-color: #3498db;
+      color: white;
+      align-self: flex-end;
+      margin-left: auto;
+    }
+    .message-username {
+      font-weight: bold;
+      margin-bottom: 5px;
+      font-size: 0.9rem;
+    }
+    .sent .message-username {
+      color: #f0f0f0;
+    }
+    .message-text {
+      word-break: break-word;
+    }
+    .message-time {
+      text-align: right;
+      font-size: 0.7rem;
+      color: #777;
+      margin-top: 5px;
+    }
+    .sent .message-time {
+      color: #f0f0f0;
+    }
+    .input-area {
+      display: flex;
+      padding: 15px;
+      border-top: 1px solid #ddd;
+      background-color: #f9f9f9;
+      position: fixed;
+    bottom: 0;
+    width: calc(100% - 270px);
+    }
+    .message-input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    .send-button, .file-button {
+      padding: 12px 15px;
+      margin-left: 10px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .send-button:hover, .file-button:hover {
+      background-color: #2980b9;
+    }
+    .file-button {
+      position: relative;
+      overflow: hidden;
+    }
+    .file-input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+    .file-message {
+      background-color: #e1f5fe;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 5px;
+    }
+    .sent .file-message {
+      background-color: #2980b9;
+    }
+    .file-link {
+      color: #3498db;
+      text-decoration: none;
+      display: block;
+      margin-top: 5px;
+      padding: 5px 10px;
+      background-color: #f9f9f9;
+      border-radius: 4px;
+      text-align: center;
+      transition: background-color 0.3s;
+    }
+    .file-link:hover {
+      background-color: #f1f1f1;
+    }
+    .sent .file-link {
+      background-color: #f9f9f9;
+      color: #3498db;
+    }
+    .system-message {
+      text-align: center;
+      margin: 10px 0;
+      color: #7f8c8d;
+      font-style: italic;
+      padding: 5px 10px;
+      background-color: #f9f9f9;
+      border-radius: 15px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #7f8c8d;
+    }
+    .date-divider {
+      text-align: center;
+      margin: 20px 0;
+      position: relative;
+    }
+    .date-divider::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      width: 100%;
+      height: 1px;
+      background-color: #ddd;
+      z-index: 1;
+    }
+    .date-divider span {
+      background-color: #ecf0f1;
+      padding: 0 10px;
+      position: relative;
+      z-index: 2;
+      color: #7f8c8d;
+      font-size: 0.8rem;
+    }
+    .message-status {
+      text-align: right;
+      font-size: 0.7rem;
+      margin-top: 2px;
+    }
+    .sent .message-status {
+      color: #f0f0f0;
+    }
+    .typing-indicator {
+      padding: 10px;
+      font-style: italic;
+      color: #7f8c8d;
+    }
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        max-height: 150px;
+      }
+      .message {
+        max-width: 85%;
+      }
+      #messagesContainer{
+        max-height: calc(100vh - 235px);
+        overflow-y: scroll;
+      }
+      .input-area {
+      width: 100%;
+    }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container" id="loginContainer">
+    <div class="login-form">
+      <h2>Enter Username</h2>
+      <input type="text" id="usernameInput" placeholder="Your username">
+      <button id="joinButton">Join Chat</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="sidebar">
+      <h2>Online Users</h2>
+      <div class="users-list" id="usersList"></div>
+    </div>
+    <div class="main">
+      <div class="chat-header">
+        <h2>LAN Messenger</h2>
+        <div id="connectionStatus">Connected</div>
+      </div>
+      <div class="messages" id="messagesContainer">
+        <div class="loading" id="loadingIndicator">Loading message history...</div>
+      </div>
+      <div class="input-area">
+        <input type="text" class="message-input" id="messageInput" placeholder="Type a message...">
+        <label class="file-button">
+          File
+          <input type="file" class="file-input" id="fileInput">
+        </label>
+        <button class="send-button" id="sendButton">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    // Connect to Socket.io server
+    const socket = io();
+    
+    // DOM elements
+    const loginContainer = document.getElementById('loginContainer');
+    const usernameInput = document.getElementById('usernameInput');
+    const joinButton = document.getElementById('joinButton');
+    const usersList = document.getElementById('usersList');
+    const messagesContainer = document.getElementById('messagesContainer');
+    const messageInput = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendButton');
+    const fileInput = document.getElementById('fileInput');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const connectionStatus = document.getElementById('connectionStatus');
+    
+    let username = '';
+    let lastMessageDate = null;
+    
+    // Check for saved username in local storage
+    const savedUsername = localStorage.getItem('lanMessengerUsername');
+    if (savedUsername) {
+      usernameInput.value = savedUsername;
+    }
+    
+    // Connection status handling
+    socket.on('connect', () => {
+      connectionStatus.textContent = 'Connected';
+      connectionStatus.style.color = '#2ecc71';
+      
+      // If we were already logged in before a reconnect
+      if (username) {
+        socket.emit('user-join', username);
+      }
+    });
+    
+    socket.on('disconnect', () => {
+      connectionStatus.textContent = 'Disconnected';
+      connectionStatus.style.color = '#e74c3c';
+    });
+    
+    // Join chat when button is clicked
+    joinButton.addEventListener('click', () => {
+      username = usernameInput.value.trim();
+      if (username) {
+        loginContainer.style.display = 'none';
+        socket.emit('user-join', username);
+        localStorage.setItem('lanMessengerUsername', username);
+      }
+    });
+    
+    // Allow pressing Enter to join
+    usernameInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        joinButton.click();
+      }
+    });
+    
+    // Socket events
+    socket.on('user-joined', (user) => {
+      updateUsersList();
+    });
+    
+    socket.on('user-left', (user) => {
+      updateUsersList();
+    });
+    
+    socket.on('users-list', (users) => {
+      updateUsersList(users);
+    });
+    
+    socket.on('chat-message', (data) => {
+      addMessage(data);
+    });
+    
+    socket.on('new-file', (data) => {
+      addFileMessage(data);
+    });
+    
+    socket.on('system-message', (data) => {
+      addSystemMessage(data.message);
+    });
+    
+    socket.on('message-history', (messages) => {
+      // Clear loading indicator
+      loadingIndicator.style.display = 'none';
+      messagesContainer.innerHTML = '';
+      
+      if (messages.length === 0) {
+        addSystemMessage('No message history yet. Start a conversation!');
+        return;
+      }
+      
+      // Process message history
+      messages.forEach(msg => {
+        if (msg.type === 'chat') {
+          addMessage(msg);
+        } else if (msg.type === 'file') {
+          addFileMessage(msg);
+        } else if (msg.type === 'system') {
+          addSystemMessage(msg.message);
+        }
+      });
+      
+      scrollToBottom();
+    });
+    
+    // Send message when button is clicked
+    sendButton.addEventListener('click', sendMessage);
+    
+    // Allow pressing Enter to send message
+    messageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+    
+    // Handle file uploads
+    fileInput.addEventListener('change', uploadFile);
+    
+    // Functions
+    function sendMessage() {
+      const message = messageInput.value.trim();
+      if (message && username) {
+        socket.emit('chat-message', message);
+        messageInput.value = '';
+      }
+    }
+    
+    function addMessage(data) {
+      // Add date divider if needed
+      checkAndAddDateDivider(data.timestamp);
+      
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message');
+      messageDiv.classList.add(data.username === username ? 'sent' : 'received');
+      messageDiv.setAttribute('data-message-id', data.id || '');
+      
+      const usernameDiv = document.createElement('div');
+      usernameDiv.classList.add('message-username');
+      usernameDiv.textContent = data.username;
+      
+      const textDiv = document.createElement('div');
+      textDiv.classList.add('message-text');
+      textDiv.textContent = data.message;
+      
+      const timeDiv = document.createElement('div');
+      timeDiv.classList.add('message-time');
+      timeDiv.textContent = formatTime(data.timestamp);
+      
+      messageDiv.appendChild(usernameDiv);
+      messageDiv.appendChild(textDiv);
+      messageDiv.appendChild(timeDiv);
+      
+      messagesContainer.appendChild(messageDiv);
+      scrollToBottom();
+    }
+    
+    function addFileMessage(data) {
+      // Add date divider if needed
+      checkAndAddDateDivider(data.timestamp);
+      
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message');
+      messageDiv.classList.add(data.username === username ? 'sent' : 'received');
+      messageDiv.setAttribute('data-message-id', data.id || '');
+      
+      const usernameDiv = document.createElement('div');
+      usernameDiv.classList.add('message-username');
+      usernameDiv.textContent = data.username;
+      
+      const textDiv = document.createElement('div');
+      textDiv.classList.add('message-text');
+      textDiv.textContent = `Shared a file: ${data.fileInfo.originalname}`;
+      
+      const fileDiv = document.createElement('div');
+      fileDiv.classList.add('file-message');
+      
+      const fileSizeText = formatFileSize(data.fileInfo.size);
+      fileDiv.textContent = `${data.fileInfo.originalname} (${fileSizeText})`;
+      
+      const fileLink = document.createElement('a');
+      fileLink.classList.add('file-link');
+      fileLink.href = data.fileInfo.path;
+      fileLink.target = '_blank';
+      fileLink.textContent = 'Download';
+      fileLink.download = data.fileInfo.originalname;
+      
+      fileDiv.appendChild(fileLink);
+      
+      const timeDiv = document.createElement('div');
+      timeDiv.classList.add('message-time');
+      timeDiv.textContent = formatTime(data.timestamp);
+      
+      messageDiv.appendChild(usernameDiv);
+      messageDiv.appendChild(textDiv);
+      messageDiv.appendChild(fileDiv);
+      messageDiv.appendChild(timeDiv);
+      
+      messagesContainer.appendChild(messageDiv);
+      scrollToBottom();
+    }
+    
+    function addSystemMessage(message) {
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('system-message');
+      messageDiv.textContent = message;
+      
+      messagesContainer.appendChild(messageDiv);
+      scrollToBottom();
+    }
+    
+    function checkAndAddDateDivider(timestamp) {
+      const messageDate = new Date(timestamp).toLocaleDateString();
+      
+      if (!lastMessageDate || lastMessageDate !== messageDate) {
+        const divider = document.createElement('div');
+        divider.classList.add('date-divider');
+        
+        const dateSpan = document.createElement('span');
+        dateSpan.textContent = messageDate;
+        
+        divider.appendChild(dateSpan);
+        messagesContainer.appendChild(divider);
+        
+        lastMessageDate = messageDate;
+      }
+    }
+    
+    function updateUsersList(users = []) {
+      usersList.innerHTML = '';
+      
+      if (username && !users.includes(username)) {
+        users.push(username);
+      }
+      
+      users.forEach(user => {
+        const userItem = document.createElement('div');
+        userItem.classList.add('user-item');
+        
+        const statusDot = document.createElement('div');
+        statusDot.classList.add('user-status');
+        
+        const userName = document.createElement('span');
+        userName.textContent = user === username ? `${user} (You)` : user;
+        
+        userItem.appendChild(statusDot);
+        userItem.appendChild(userName);
+        usersList.appendChild(userItem);
+      });
+    }
+    
+    function uploadFile() {
+      if (!username || !fileInput.files.length) return;
+      
+      const file = fileInput.files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('username', username);
+      
+      // Show uploading indicator
+      addSystemMessage(`Uploading ${file.name}...`);
+      
+      fetch('/upload', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (!data.success) {
+          addSystemMessage('Failed to upload file.');
+        }
+        // Reset file input
+        fileInput.value = '';
+      })
+      .catch(error => {
+        console.error('Error uploading file:', error);
+        addSystemMessage('Error uploading file.');
+        fileInput.value = '';
+      });
+    }
+    
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' bytes';
+      if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / 1048576).toFixed(1) + ' MB';
+    }
+    
+    function formatTime(timestamp) {
+      return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    
+    function scrollToBottom() {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+        // Add drag and drop functionality
+        let dragCounter = 0;
+
+      function handleDragOver(e) {
+        e.preventDefault();
+        dragCounter++;
+        if(!document.body.classList.contains('body-dragover')) {
+          document.body.classList.add('body-dragover');
+        }
+      }
+
+      function handleDragLeave(e) {
+        dragCounter--;
+        
+          document.body.classList.remove('body-dragover');
+        
+      }
+
+      function handleDrop(e) {
+        e.preventDefault();
+        dragCounter = 0;
+        document.body.classList.remove('body-dragover');
+
+        if (!username) {
+          addSystemMessage('Please join the chat before uploading files');
+          return;
+        }
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          // Handle only the first file
+          const file = files[0];
+          
+          // Create a new DataTransfer object and add the file
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+          
+          // Assign the DataTransfer files to the file input
+          fileInput.files = dataTransfer.files;
+          
+          // Trigger the change event
+          const event = new Event('change');
+          fileInput.dispatchEvent(event);
+        }
+      }
+
+      // Add event listeners
+      document.body.addEventListener('dragover', handleDragOver);
+      document.body.addEventListener('dragleave', handleDragLeave);
+      document.body.addEventListener('drop', handleDrop);
+  </script>
+</body>
+</html>
