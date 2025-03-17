@@ -158,6 +158,20 @@ io.on('connection', (socket) => {
     io.emit('chat-message', messageObj);
   });
 
+  socket.on('typing', () => {
+    const username = users[socket.id];
+    if (username) {
+      socket.broadcast.emit('user-typing', username);
+    }
+  });
+
+  socket.on('stop-typing', () => {
+    const username = users[socket.id];
+    if (username) {
+      socket.broadcast.emit('user-stop-typing', username);
+    }
+  });
+
   // Handle disconnection
   socket.on('disconnect', () => {
     const username = users[socket.id];

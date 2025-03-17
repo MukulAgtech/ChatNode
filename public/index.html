@@ -577,6 +577,18 @@
       addMessage(data);
     });
     
+    // Listen for typing events
+    socket.on('user-typing', (username) => {
+      // Show typing indicator (e.g., display username is typing)
+      console.log(`${username} is typing...`);
+    });
+
+    // Listen for stop-typing events
+    socket.on('user-stop-typing', (username) => {
+      // Hide typing indicator
+      console.log(`${username} stopped typing`);
+    });
+
     socket.on('new-file', (data) => {
       addFileMessage(data);
     });
@@ -612,9 +624,21 @@
     // Send message when button is clicked
     sendButton.addEventListener('click', sendMessage);
     
+    messageInput.addEventListener('input', () => {
+      console.log("data");
+      socket.emit('typing'); // Notify server that the user is typing
+    });
+
+
     // Allow pressing Enter to send message
+    let typingTimeout;
     messageInput.addEventListener('keypress', (e) => {
+      clearTimeout(typingTimeout);
+      typingTimeout = setTimeout(() => {
+        socket.emit('stop-typing'); // Notify server that the user stopped typing
+      }, 1000);
       if (e.key === 'Enter') {
+        socket.emit('stop-typing'); // Notify server that the user stopped typing
         sendMessage();
       }
     });
