@@ -309,6 +309,122 @@
       font-style: italic;
       color: #7f8c8d;
     }
+    /* Media viewer styles */
+    .media-preview {
+      max-width: 200px;
+      max-height: 150px;
+      cursor: pointer;
+      border-radius: 4px;
+      margin-top: 5px;
+      border: 1px solid #ddd;
+      position: relative;
+    }
+    .video-thumbnail {
+      width: 200px;
+      height: 150px;
+      background-color: #000;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+    .video-thumbnail::after {
+      content: '▶';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 40px;
+      font-size: 18px;
+    }
+    .video-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;
+      max-width: 900px;
+    }
+    #modalVideo {
+      width: 100%;
+      max-height: 90vh;
+      background-color: #000;
+    }
+    .media-modal {
+      display: none;
+      position: fixed;
+      z-index: 1100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: rgba(0, 0, 0, 0.9);
+    }
+    .modal-content {
+      margin: auto;
+      display: block;
+      max-width: 90%;
+      max-height: 90%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .close-modal {
+      position: absolute;
+      top: 15px;
+      right: 25px;
+      color: #f1f1f1;
+      font-size: 40px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 1120;
+    }
+    .media-controls {
+      position: absolute;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 8px 15px;
+      border-radius: 5px;
+      display: flex;
+      z-index: 1120;
+    }
+    .control-btn {
+      color: white;
+      font-size: 18px;
+      margin: 0 10px;
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      text-align: center;
+      line-height: 36px;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+    }
+    .video-controls {
+      width: 100%;
+      position: absolute;
+      bottom: 15px;
+      left: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 10px;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .video-container:hover .video-controls {
+      opacity: 1;
+    }
     
     /* Responsive design */
     @media (max-width: 768px) {
@@ -362,6 +478,26 @@
         </label>
         <button class="send-button" id="sendButton">Send</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Media Modal -->
+  <div id="mediaModal" class="media-modal">
+    <span class="close-modal" id="closeModal">&times;</span>
+    
+    <!-- Image Viewer -->
+    <img class="modal-content" id="modalImage" style="display: none;">
+    <div class="media-controls" id="imageControls" style="display: none;">
+      <div class="control-btn" id="zoomIn">+</div>
+      <div class="control-btn" id="zoomOut">-</div>
+      <div class="control-btn" id="zoomReset">↺</div>
+    </div>
+    
+    <!-- Video Player -->
+    <div class="video-container" id="videoContainer" style="display: none;">
+      <video id="modalVideo" class="modal-content" controls>
+        Your browser does not support the video tag.
+      </video>
     </div>
   </div>
 
@@ -556,6 +692,71 @@
       
       fileDiv.appendChild(fileLink);
       
+      // Check if the file is an image or video
+      const fileExt = data.fileInfo.originalname.split('.').pop().toLowerCase();
+      const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+      const videoExts = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
+      
+      if (imageExts.includes(fileExt)) {
+        // Handle image files
+        const imagePreview = document.createElement('img');
+        imagePreview.classList.add('media-preview');
+        imagePreview.src = data.fileInfo.path;
+        imagePreview.alt = data.fileInfo.originalname;
+        imagePreview.onclick = function() {
+          openMediaViewer('image', data.fileInfo.path);
+        };
+        
+        fileDiv.appendChild(imagePreview);
+      } else if (videoExts.includes(fileExt)) {
+        // Handle video files
+        const videoPreviewContainer = document.createElement('div');
+        videoPreviewContainer.classList.add('media-preview', 'video-thumbnail');
+        videoPreviewContainer.style.backgroundImage = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="150" viewBox="0 0 200 150"><rect width="100%" height="100%" fill="%23111"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="14" fill="%23ddd">Video: ${fileExt.toUpperCase()}</text></svg>')`;
+        videoPreviewContainer.onclick = function() {
+          openMediaViewer('video', data.fileInfo.path);
+        };
+        
+        // Try to create a video thumbnail 
+        const videoElement = document.createElement('video');
+        videoElement.src = data.fileInfo.path;
+        videoElement.muted = true;
+        videoElement.preload = "metadata";
+        
+        videoElement.addEventListener('loadedmetadata', function() {
+          try {
+            // Wait a bit to let the video load enough frames
+            videoElement.currentTime = 1;
+          } catch (e) {
+            console.error('Error setting video time:', e);
+          }
+        });
+        
+        videoElement.addEventListener('seeked', function() {
+          try {
+            // Create a canvas and draw the video frame
+            const canvas = document.createElement('canvas');
+            canvas.width = videoElement.videoWidth;
+            canvas.height = videoElement.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+            
+            // Use the canvas data as the thumbnail background
+            const thumbnailUrl = canvas.toDataURL();
+            videoPreviewContainer.style.backgroundImage = `url('${thumbnailUrl}')`;
+          } catch (e) {
+            console.error('Error creating thumbnail:', e);
+          }
+        });
+        
+        // Add error handling
+        videoElement.addEventListener('error', function(e) {
+          console.error('Video thumbnail generation error:', e);
+        });
+        
+        fileDiv.appendChild(videoPreviewContainer);
+      }
+      
       const timeDiv = document.createElement('div');
       timeDiv.classList.add('message-time');
       timeDiv.textContent = formatTime(data.timestamp);
@@ -662,56 +863,198 @@
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
-        // Add drag and drop functionality
-        let dragCounter = 0;
+    // Add drag and drop functionality
+    let dragCounter = 0;
 
-      function handleDragOver(e) {
-        e.preventDefault();
-        dragCounter++;
-        if(!document.body.classList.contains('body-dragover')) {
-          document.body.classList.add('body-dragover');
-        }
+    function handleDragOver(e) {
+      e.preventDefault();
+      dragCounter++;
+      if(!document.body.classList.contains('body-dragover')) {
+        document.body.classList.add('body-dragover');
+      }
+    }
+
+    function handleDragLeave(e) {
+      dragCounter--;
+      
+      document.body.classList.remove('body-dragover');
+      
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      dragCounter = 0;
+      document.body.classList.remove('body-dragover');
+
+      if (!username) {
+        addSystemMessage('Please join the chat before uploading files');
+        return;
       }
 
-      function handleDragLeave(e) {
-        dragCounter--;
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        // Handle only the first file
+        const file = files[0];
         
-          document.body.classList.remove('body-dragover');
+        // Create a new DataTransfer object and add the file
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
         
+        // Assign the DataTransfer files to the file input
+        fileInput.files = dataTransfer.files;
+        
+        // Trigger the change event
+        const event = new Event('change');
+        fileInput.dispatchEvent(event);
       }
+    }
 
-      function handleDrop(e) {
+    // Add event listeners
+    document.body.addEventListener('dragover', handleDragOver);
+    document.body.addEventListener('dragleave', handleDragLeave);
+    document.body.addEventListener('drop', handleDrop);
+
+    // Add media viewer functionality at the end of the script
+    
+    // Media viewer elements
+    const mediaModal = document.getElementById('mediaModal');
+    const modalImage = document.getElementById('modalImage');
+    const modalVideo = document.getElementById('modalVideo');
+    const videoContainer = document.getElementById('videoContainer');
+    const closeModal = document.getElementById('closeModal');
+    const imageControls = document.getElementById('imageControls');
+    
+    // Image controls
+    const zoomIn = document.getElementById('zoomIn');
+    const zoomOut = document.getElementById('zoomOut');
+    const zoomReset = document.getElementById('zoomReset');
+    
+    let currentZoom = 1;
+    
+    function openMediaViewer(type, mediaSrc) {
+      // Reset zoom for images
+      currentZoom = 1;
+      translateX = 0;
+      translateY = 0;
+      
+      // Hide all media elements first
+      modalImage.style.display = 'none';
+      imageControls.style.display = 'none';
+      videoContainer.style.display = 'none';
+      
+      // Show the modal
+      mediaModal.style.display = 'block';
+      
+      if (type === 'image') {
+        // Show image viewer
+        modalImage.src = mediaSrc;
+        modalImage.style.transform = `scale(${currentZoom})`;
+        modalImage.style.display = 'block';
+        imageControls.style.display = 'flex';
+      } else if (type === 'video') {
+        // Show video player
+        modalVideo.src = mediaSrc;
+        videoContainer.style.display = 'block';
+        
+        // Force the video to load before trying to play
+        modalVideo.load();
+        
+        // Add a slight delay before playing to allow the video to initialize
+        setTimeout(() => {
+          const playPromise = modalVideo.play();
+          
+          // Handle potential play() promise rejection
+          if (playPromise !== undefined) {
+            playPromise.catch(error => {
+              console.error('Error playing video:', error);
+              // Sometimes autoplay is blocked by browsers
+              // Add a play button or notify the user to click on the video
+            });
+          }
+        }, 100);
+      }
+    }
+    
+    // Close modal button
+    closeModal.onclick = function() {
+      mediaModal.style.display = 'none';
+      modalVideo.pause();
+      modalVideo.currentTime = 0;
+    }
+    
+    // Image zoom controls
+    zoomIn.onclick = function() {
+      currentZoom += 0.2;
+      if (currentZoom > 5) currentZoom = 5;
+      modalImage.style.transform = `scale(${currentZoom})`;
+    }
+    
+    zoomOut.onclick = function() {
+      currentZoom -= 0.2;
+      if (currentZoom < 0.5) currentZoom = 0.5;
+      modalImage.style.transform = `scale(${currentZoom})`;
+    }
+    
+    zoomReset.onclick = function() {
+      currentZoom = 1;
+      modalImage.style.transform = `scale(${currentZoom})`;
+    }
+    
+    // Close modal when clicking outside media
+    mediaModal.onclick = function(event) {
+      if (event.target === mediaModal) {
+        mediaModal.style.display = 'none';
+        modalVideo.pause();
+        modalVideo.currentTime = 0;
+      }
+    }
+    
+    // Allow ESC key to close the modal
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape' && mediaModal.style.display === 'block') {
+        mediaModal.style.display = 'none';
+        modalVideo.pause();
+        modalVideo.currentTime = 0;
+      }
+    });
+    
+    // Enable image dragging when zoomed
+    let isDragging = false;
+    let lastX, lastY;
+    let translateX = 0, translateY = 0;
+    
+    modalImage.onmousedown = function(e) {
+      if (currentZoom > 1) {
+        isDragging = true;
+        lastX = e.clientX;
+        lastY = e.clientY;
         e.preventDefault();
-        dragCounter = 0;
-        document.body.classList.remove('body-dragover');
-
-        if (!username) {
-          addSystemMessage('Please join the chat before uploading files');
-          return;
-        }
-
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-          // Handle only the first file
-          const file = files[0];
-          
-          // Create a new DataTransfer object and add the file
-          const dataTransfer = new DataTransfer();
-          dataTransfer.items.add(file);
-          
-          // Assign the DataTransfer files to the file input
-          fileInput.files = dataTransfer.files;
-          
-          // Trigger the change event
-          const event = new Event('change');
-          fileInput.dispatchEvent(event);
-        }
       }
-
-      // Add event listeners
-      document.body.addEventListener('dragover', handleDragOver);
-      document.body.addEventListener('dragleave', handleDragLeave);
-      document.body.addEventListener('drop', handleDrop);
+    };
+    
+    document.onmousemove = function(e) {
+      if (isDragging) {
+        const deltaX = e.clientX - lastX;
+        const deltaY = e.clientY - lastY;
+        lastX = e.clientX;
+        lastY = e.clientY;
+        
+        translateX += deltaX / currentZoom;
+        translateY += deltaY / currentZoom;
+        
+        modalImage.style.transform = `scale(${currentZoom}) translate(${translateX}px, ${translateY}px)`;
+      }
+    };
+    
+    document.onmouseup = function() {
+      isDragging = false;
+    };
+    
+    // Reset position when zoom is reset
+    zoomReset.addEventListener('click', function() {
+      translateX = 0;
+      translateY = 0;
+    });
   </script>
 </body>
 </html>
