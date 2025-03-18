@@ -498,6 +498,103 @@
         width: 100%;
       }
     }
+    /* Pin feature styles */
+    .pin-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+      color: #bbb;
+      font-size: 16px;
+      opacity: 0;
+      transition: opacity 0.2s, color 0.2s;
+    }
+    .message:hover .pin-button {
+      opacity: 1;
+    }
+    .pin-button.pinned {
+      color: #e74c3c;
+      opacity: 1;
+    }
+    .pinned-messages-container {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      width: 300px;
+      max-height: 400px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      z-index: 100;
+      overflow: hidden;
+      display: none;
+    }
+    .pinned-header {
+      background-color: #3498db;
+      color: white;
+      padding: 10px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .close-pinned {
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .pinned-list {
+      max-height: 350px;
+      overflow-y: auto;
+      padding: 10px;
+    }
+    .pinned-item {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .pinned-item:hover {
+      background-color: #f5f5f5;
+    }
+    .pinned-username {
+      font-weight: bold;
+      font-size: 0.9rem;
+      margin-bottom: 3px;
+    }
+    .pinned-text {
+      font-size: 0.9rem;
+      color: #333;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pin-count-button {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      position: fixed;
+      top: 69px;
+      right: 15px;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      z-index: 50;
+      font-weight: bold;
+      display: none;
+    }
+    .message {
+      position: relative;
+    }
+    @media (max-width: 768px) {
+      .pinned-messages-container {
+        width: 80%;
+        max-width: 300px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
   </style>
 </head>
 <body>
@@ -539,6 +636,16 @@
     </div>
   </div>
 
+  <!-- Pinned Messages -->
+  <button id="pinCountButton" class="pin-count-button">0</button>
+  <div id="pinnedMessagesContainer" class="pinned-messages-container">
+    <div class="pinned-header">
+      <span>Pinned Messages</span>
+      <span class="close-pinned" id="closePinned">×</span>
+    </div>
+    <div class="pinned-list" id="pinnedList"></div>
+  </div>
+
   <!-- Media Modal -->
   <div id="mediaModal" class="media-modal">
     <span class="close-modal" id="closeModal">&times;</span>
@@ -575,9 +682,14 @@
     const fileInput = document.getElementById('fileInput');
     const loadingIndicator = document.getElementById('loadingIndicator');
     const connectionStatus = document.getElementById('connectionStatus');
+    const pinnedMessagesContainer = document.getElementById('pinnedMessagesContainer');
+    const pinnedList = document.getElementById('pinnedList');
+    const pinCountButton = document.getElementById('pinCountButton');
+    const closePinned = document.getElementById('closePinned');
     
     let username = '';
     let lastMessageDate = null;
+    let pinnedMessages = JSON.parse(localStorage.getItem('pinnedMessages') || '[]');
     
     // Check for saved username in local storage
     const savedUsername = localStorage.getItem('lanMessengerUsername');
@@ -697,6 +809,7 @@
       messageDiv.classList.add('message');
       messageDiv.classList.add(data.username === username ? 'sent' : 'received');
       messageDiv.setAttribute('data-message-id', data.id || '');
+      messageDiv.setAttribute('data-timestamp', data.timestamp || Date.now());
       
       const usernameDiv = document.createElement('div');
       usernameDiv.classList.add('message-username');
@@ -710,12 +823,161 @@
       timeDiv.classList.add('message-time');
       timeDiv.textContent = formatTime(data.timestamp);
       
+      // Add pin button
+      const pinButton = document.createElement('div');
+      pinButton.classList.add('pin-button');
+      pinButton.innerHTML = '📌';
+      pinButton.setAttribute('title', 'Pin this message');
+      pinButton.onclick = function(e) {
+        e.stopPropagation();
+        togglePin(messageDiv, data);
+      };
+      
+      // Check if message is already pinned
+      const isPinned = pinnedMessages.some(msg => 
+        msg.id === data.id || 
+        (msg.message === data.message && msg.username === data.username && msg.timestamp === data.timestamp)
+      );
+      
+      if (isPinned) {
+        pinButton.classList.add('pinned');
+      }
+      
+      messageDiv.appendChild(pinButton);
       messageDiv.appendChild(usernameDiv);
       messageDiv.appendChild(textDiv);
       messageDiv.appendChild(timeDiv);
       
       messagesContainer.appendChild(messageDiv);
       scrollToBottom();
+    }
+    
+    function togglePin(messageDiv, messageData) {
+      // Create a unique ID for the message if it doesn't have one
+      const messageId = messageData.id || `msg_${messageData.username}_${messageData.timestamp}`;
+      const pinButton = messageDiv.querySelector('.pin-button');
+      
+      // Check if message is already pinned
+      const isPinned = pinnedMessages.some(msg => 
+        msg.id === messageId || 
+        (msg.message === messageData.message && msg.username === messageData.username && msg.timestamp === messageData.timestamp)
+      );
+      
+      if (isPinned) {
+        // Unpin the message
+        pinnedMessages = pinnedMessages.filter(msg => 
+          !(msg.id === messageId || 
+            (msg.message === messageData.message && msg.username === messageData.username && msg.timestamp === messageData.timestamp))
+        );
+        pinButton.classList.remove('pinned');
+      } else {
+        // Pin the message
+        const pinnedMsg = {
+          id: messageId,
+          username: messageData.username,
+          message: messageData.message,
+          timestamp: messageData.timestamp,
+          type: 'chat'
+        };
+        pinnedMessages.push(pinnedMsg);
+        pinButton.classList.add('pinned');
+      }
+      
+      // Save pinned messages
+      localStorage.setItem('pinnedMessages', JSON.stringify(pinnedMessages));
+      
+      // Update pinned messages display
+      updatePinnedMessages();
+    }
+    
+    function updatePinnedMessages() {
+      pinnedList.innerHTML = '';
+      
+      if (pinnedMessages.length === 0) {
+        pinCountButton.style.display = 'none';
+        return;
+      }
+      
+      // Update pin count and show button
+      pinCountButton.textContent = pinnedMessages.length;
+      pinCountButton.style.display = 'block';
+      
+      // Sort pinned messages by timestamp (newest first)
+      pinnedMessages.sort((a, b) => b.timestamp - a.timestamp);
+      
+      // Add each pinned message to the list
+      pinnedMessages.forEach(msg => {
+        const pinnedItem = document.createElement('div');
+        pinnedItem.classList.add('pinned-item');
+        
+        const pinnedUsername = document.createElement('div');
+        pinnedUsername.classList.add('pinned-username');
+        pinnedUsername.textContent = msg.username;
+        
+        const pinnedText = document.createElement('div');
+        pinnedText.classList.add('pinned-text');
+        
+        if (msg.type === 'chat') {
+          pinnedText.textContent = msg.message;
+        } else if (msg.type === 'file') {
+          pinnedText.textContent = `Shared a file: ${msg.fileInfo.originalname}`;
+        }
+        
+        pinnedItem.appendChild(pinnedUsername);
+        pinnedItem.appendChild(pinnedText);
+        
+        // Add click event to navigate to the message
+        pinnedItem.onclick = function() {
+          navigateToMessage(msg);
+        };
+        
+        pinnedList.appendChild(pinnedItem);
+      });
+    }
+    
+    function navigateToMessage(pinnedMsg) {
+      // Close the pinned messages panel
+      pinnedMessagesContainer.style.display = 'none';
+      
+      // Try to find the message in the chat
+      const messages = messagesContainer.querySelectorAll('.message');
+      let targetMessage = null;
+      
+      for (const message of messages) {
+        const messageId = message.getAttribute('data-message-id');
+        const timestamp = message.getAttribute('data-timestamp');
+        const username = message.querySelector('.message-username').textContent;
+        const text = message.querySelector('.message-text').textContent;
+        
+        if (messageId === pinnedMsg.id || 
+            (text.includes(pinnedMsg.message) && username === pinnedMsg.username && timestamp == pinnedMsg.timestamp)) {
+          targetMessage = message;
+          break;
+        }
+      }
+      
+      if (targetMessage) {
+        // Highlight the message temporarily
+        targetMessage.style.backgroundColor = '#ffffa0';
+        
+        // Scroll to the message
+        targetMessage.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
+        
+        // Remove highlight after a delay
+        setTimeout(() => {
+          if (targetMessage.classList.contains('sent')) {
+            targetMessage.style.backgroundColor = '#3498db';
+          } else {
+            targetMessage.style.backgroundColor = 'white';
+          }
+        }, 2000);
+      } else {
+        // Message not found in current view
+        alert('This message is not in the current chat view.');
+      }
     }
     
     function addFileMessage(data) {
@@ -726,6 +988,7 @@
       messageDiv.classList.add('message');
       messageDiv.classList.add(data.username === username ? 'sent' : 'received');
       messageDiv.setAttribute('data-message-id', data.id || '');
+      messageDiv.setAttribute('data-timestamp', data.timestamp || Date.now());
       
       const usernameDiv = document.createElement('div');
       usernameDiv.classList.add('message-username');
@@ -819,6 +1082,35 @@
       timeDiv.classList.add('message-time');
       timeDiv.textContent = formatTime(data.timestamp);
       
+      // Add pin button
+      const pinButton = document.createElement('div');
+      pinButton.classList.add('pin-button');
+      pinButton.innerHTML = '📌';
+      pinButton.setAttribute('title', 'Pin this message');
+      pinButton.onclick = function(e) {
+        e.stopPropagation();
+        togglePin(messageDiv, {
+          id: data.id,
+          username: data.username,
+          message: `Shared a file: ${data.fileInfo.originalname}`,
+          timestamp: data.timestamp,
+          type: 'file',
+          fileInfo: data.fileInfo
+        });
+      };
+      
+      // Check if message is already pinned
+      const isPinned = pinnedMessages.some(msg => 
+        msg.id === data.id || 
+        (msg.type === 'file' && msg.fileInfo.originalname === data.fileInfo.originalname && 
+         msg.username === data.username && msg.timestamp === data.timestamp)
+      );
+      
+      if (isPinned) {
+        pinButton.classList.add('pinned');
+      }
+      
+      messageDiv.appendChild(pinButton);
       messageDiv.appendChild(usernameDiv);
       messageDiv.appendChild(textDiv);
       messageDiv.appendChild(fileDiv);
@@ -1252,6 +1544,18 @@
         performSearch();
       }
     };
+
+    // Add event listeners for pinned messages
+    pinCountButton.addEventListener('click', function() {
+      pinnedMessagesContainer.style.display = 'block';
+    });
+    
+    closePinned.addEventListener('click', function() {
+      pinnedMessagesContainer.style.display = 'none';
+    });
+    
+    // Initialize pinned messages on load
+    updatePinnedMessages();
   </script>
 </body>
 </html>
