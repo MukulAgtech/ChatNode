@@ -446,6 +446,58 @@
       width: 100%;
     }
     }
+    .search-container {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: white;
+      border-radius: 4px;
+      padding: 4px 8px;
+    }
+    #searchInput {
+      border: none;
+      outline: none;
+      padding: 5px;
+      width: 200px;
+      font-size: 14px;
+    }
+    #searchPrev, #searchNext {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0 5px;
+      font-size: 16px;
+      color: #666;
+    }
+    #searchPrev:hover, #searchNext:hover {
+      color: #333;
+    }
+    #searchCount {
+      color: #666;
+      font-size: 12px;
+      margin-left: 5px;
+    }
+    .message.highlighted {
+      background-color: rgba(255, 255, 0, 0.279) !important;
+      color: black !important;
+    }
+    .message.current-match {
+      background-color: rgba(255, 255, 0, 0.603) !important;
+      color: black !important;
+    }
+    @media (max-width: 768px) {
+      .chat-header {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .search-container {
+        width: 100%;
+        justify-content: center;
+      }
+      #searchInput {
+        width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
@@ -465,6 +517,12 @@
     <div class="main">
       <div class="chat-header">
         <h2>LAN Messenger</h2>
+        <div class="search-container">
+          <input type="text" id="searchInput" placeholder="Search messages...">
+          <button id="searchPrev" title="Previous match">↑</button>
+          <button id="searchNext" title="Next match">↓</button>
+          <span id="searchCount"></span>
+        </div>
         <div id="connectionStatus">Connected</div>
       </div>
       <div class="messages" id="messagesContainer">
@@ -577,18 +635,6 @@
       addMessage(data);
     });
     
-    // Listen for typing events
-    socket.on('user-typing', (username) => {
-      // Show typing indicator (e.g., display username is typing)
-      console.log(`${username} is typing...`);
-    });
-
-    // Listen for stop-typing events
-    socket.on('user-stop-typing', (username) => {
-      // Hide typing indicator
-      console.log(`${username} stopped typing`);
-    });
-
     socket.on('new-file', (data) => {
       addFileMessage(data);
     });
@@ -624,21 +670,9 @@
     // Send message when button is clicked
     sendButton.addEventListener('click', sendMessage);
     
-    messageInput.addEventListener('input', () => {
-      console.log("data");
-      socket.emit('typing'); // Notify server that the user is typing
-    });
-
-
     // Allow pressing Enter to send message
-    let typingTimeout;
     messageInput.addEventListener('keypress', (e) => {
-      clearTimeout(typingTimeout);
-      typingTimeout = setTimeout(() => {
-        socket.emit('stop-typing'); // Notify server that the user stopped typing
-      }, 1000);
       if (e.key === 'Enter') {
-        socket.emit('stop-typing'); // Notify server that the user stopped typing
         sendMessage();
       }
     });
@@ -972,6 +1006,7 @@
       if (type === 'image') {
         // Show image viewer
         modalImage.src = mediaSrc;
+        modalImage.style.transform = `scale(${currentZoom})`;
         modalImage.style.display = 'block';
         imageControls.style.display = 'flex';
       } else if (type === 'video') {
@@ -1078,6 +1113,145 @@
       translateX = 0;
       translateY = 0;
     });
+
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const searchPrev = document.getElementById('searchPrev');
+    const searchNext = document.getElementById('searchNext');
+    const searchCount = document.getElementById('searchCount');
+
+    let currentSearchResults = [];
+    let currentMatchIndex = -1;
+
+    // Debounce function to prevent too many searches while typing
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    // Function to perform the search
+    function performSearch() {
+      const searchTerm = searchInput.value.toLowerCase().trim();
+      
+      // Clear previous highlights
+      clearHighlights();
+      
+      if (searchTerm === '') {
+        currentSearchResults = [];
+        currentMatchIndex = -1;
+        searchCount.textContent = '';
+        return;
+      }
+
+      // Find all messages that contain the search term
+      const messages = messagesContainer.getElementsByClassName('message');
+      currentSearchResults = Array.from(messages).filter(message => {
+        const messageText = message.querySelector('.message-text')?.textContent.toLowerCase() || '';
+        const username = message.querySelector('.message-username')?.textContent.toLowerCase() || '';
+        return messageText.includes(searchTerm) || username.includes(searchTerm);
+      });
+
+      // Update search count
+      searchCount.textContent = `${currentSearchResults.length} matches`;
+
+      // Highlight all matches
+      currentSearchResults.forEach(message => {
+        message.classList.add('highlighted');
+      });
+
+      // Reset current match index and highlight first match if exists
+      currentMatchIndex = currentSearchResults.length > 0 ? 0 : -1;
+      highlightCurrentMatch();
+    }
+
+    // Function to clear all highlights
+    function clearHighlights() {
+      const highlightedMessages = messagesContainer.getElementsByClassName('highlighted');
+      Array.from(highlightedMessages).forEach(message => {
+        message.classList.remove('highlighted', 'current-match');
+      });
+    }
+
+    // Function to highlight current match
+    function highlightCurrentMatch() {
+      // Remove previous current-match highlight
+      const previousMatch = messagesContainer.querySelector('.current-match');
+      if (previousMatch) {
+        previousMatch.classList.remove('current-match');
+      }
+
+      // Highlight current match if exists
+      if (currentMatchIndex >= 0 && currentSearchResults.length > 0) {
+        const currentMatch = currentSearchResults[currentMatchIndex];
+        currentMatch.classList.add('current-match');
+        
+        // Scroll the current match into view
+        currentMatch.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
+      }
+
+      // Update search count
+      if (currentSearchResults.length > 0) {
+        searchCount.textContent = `${currentMatchIndex + 1} of ${currentSearchResults.length}`;
+      }
+    }
+
+    // Event listeners
+    searchInput.addEventListener('input', debounce(() => {
+      performSearch();
+    }, 300));
+
+    searchNext.addEventListener('click', () => {
+      if (currentSearchResults.length > 0) {
+        currentMatchIndex = (currentMatchIndex + 1) % currentSearchResults.length;
+        highlightCurrentMatch();
+      }
+    });
+
+    searchPrev.addEventListener('click', () => {
+      if (currentSearchResults.length > 0) {
+        currentMatchIndex = (currentMatchIndex - 1 + currentSearchResults.length) % currentSearchResults.length;
+        highlightCurrentMatch();
+      }
+    });
+
+    // Handle keyboard shortcuts
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        if (e.shiftKey) {
+          // Shift + Enter for previous match
+          searchPrev.click();
+        } else {
+          // Enter for next match
+          searchNext.click();
+        }
+        e.preventDefault();
+      }
+      if (e.key === 'Escape') {
+        // Clear search on Escape
+        searchInput.value = '';
+        performSearch();
+        e.preventDefault();
+      }
+    });
+
+    // Add search functionality to new messages
+    const originalAddMessage = addMessage;
+    addMessage = function(data) {
+      originalAddMessage(data);
+      if (searchInput.value.trim() !== '') {
+        performSearch();
+      }
+    };
   </script>
 </body>
 </html>
