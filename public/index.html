@@ -305,23 +305,30 @@
       color: #f0f0f0;
     }
     .typing-indicator {
-      padding: 10px;
+      padding: 10px 15px;
+      color: #666;
       font-style: italic;
-      color: #7f8c8d;
+      display: none;
+      position: fixed;
+      bottom: 70px;
+      left: 270px;
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 15px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      z-index: 10;
     }
     /* Media viewer styles */
     .media-preview {
-      max-width: 200px;
-      max-height: 150px;
-      cursor: pointer;
-      border-radius: 4px;
+      max-width: 100%;
+      height: auto;
       margin-top: 5px;
+      border-radius: 4px;
       border: 1px solid #ddd;
-      position: relative;
     }
     .video-thumbnail {
-      width: 200px;
-      height: 150px;
+      width: 100%;
+      max-width: 300px;
+      aspect-ratio: 16/9;
       background-color: #000;
       background-size: cover;
       background-position: center;
@@ -365,49 +372,51 @@
       height: 100%;
       overflow: hidden;
       background-color: rgba(0, 0, 0, 0.9);
+      justify-content: center;
+      align-items: center;
     }
     .modal-content {
-      margin: auto;
-      display: block;
       max-width: 90%;
-      max-height: 90%;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      max-height: 90vh;
+      object-fit: contain;
+      margin: 0;
+      padding: 0;
+      position: relative;
+      transform: none;
+      left: 0;
+      top: 0;
     }
-    .close-modal {
-      position: absolute;
-      top: 15px;
-      right: 25px;
-      color: #f1f1f1;
-      font-size: 40px;
-      font-weight: bold;
-      cursor: pointer;
-      z-index: 1120;
+    #modalImage {
+      cursor: move;
+      display: block;
+      margin: auto;
+      transform-origin: center center;
     }
     .media-controls {
-      position: absolute;
-      bottom: 15px;
+      position: fixed;
+      bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
       background-color: rgba(0, 0, 0, 0.5);
-      padding: 8px 15px;
+      padding: 10px;
       border-radius: 5px;
       display: flex;
+      gap: 10px;
       z-index: 1120;
     }
     .control-btn {
       color: white;
-      font-size: 18px;
-      margin: 0 10px;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
       cursor: pointer;
-      width: 36px;
-      height: 36px;
+      font-size: 16px;
+      min-width: 40px;
       text-align: center;
-      line-height: 36px;
-      background-color: rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
+    }
+    .control-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
     }
     .video-controls {
       width: 100%;
@@ -444,6 +453,11 @@
       }
       .input-area {
       width: 100%;
+    }
+    .typing-indicator {
+      left: 15px;
+      bottom: 80px;
+      max-width: calc(100% - 30px);
     }
     }
     .search-container {
@@ -652,10 +666,10 @@
     
     <!-- Image Viewer -->
     <img class="modal-content" id="modalImage" style="display: none;">
-    <div class="media-controls" id="imageControls" style="display: none;">
-      <div class="control-btn" id="zoomIn">+</div>
-      <div class="control-btn" id="zoomOut">-</div>
-      <div class="control-btn" id="zoomReset">↺</div>
+    <div id="imageControls" class="media-controls" style="display: none;">
+      <button class="control-btn" id="zoomIn" title="Zoom In">+</button>
+      <button class="control-btn" id="zoomOut" title="Zoom Out">-</button>
+      <button class="control-btn" id="zoomReset" title="Reset">⟲</button>
     </div>
     
     <!-- Video Player -->
@@ -1280,10 +1294,12 @@
     const zoomReset = document.getElementById('zoomReset');
     
     let currentZoom = 1;
+    let currentRotation = 0;
     
     function openMediaViewer(type, mediaSrc) {
-      // Reset zoom for images
+      // Reset all transformations
       currentZoom = 1;
+      currentRotation = 0;
       translateX = 0;
       translateY = 0;
       
@@ -1293,117 +1309,144 @@
       videoContainer.style.display = 'none';
       
       // Show the modal
-      mediaModal.style.display = 'block';
+      mediaModal.style.display = 'flex';
       
       if (type === 'image') {
         // Show image viewer
+        modalImage.onload = function() {
+          modalImage.style.display = 'block';
+          imageControls.style.display = 'flex';
+          updateImageTransform();
+        };
         modalImage.src = mediaSrc;
-        modalImage.style.transform = `scale(${currentZoom})`;
-        modalImage.style.display = 'block';
-        imageControls.style.display = 'flex';
       } else if (type === 'video') {
         // Show video player
         modalVideo.src = mediaSrc;
         videoContainer.style.display = 'block';
-        
-        // Force the video to load before trying to play
         modalVideo.load();
         
-        // Add a slight delay before playing to allow the video to initialize
         setTimeout(() => {
           const playPromise = modalVideo.play();
-          
-          // Handle potential play() promise rejection
           if (playPromise !== undefined) {
             playPromise.catch(error => {
               console.error('Error playing video:', error);
-              // Sometimes autoplay is blocked by browsers
-              // Add a play button or notify the user to click on the video
             });
           }
         }, 100);
       }
     }
     
-    // Close modal button
-    closeModal.onclick = function() {
-      mediaModal.style.display = 'none';
-      modalVideo.pause();
-      modalVideo.currentTime = 0;
+    // Function to update image transform
+    function updateImageTransform() {
+      if (modalImage) {
+        modalImage.style.transform = `rotate(${currentRotation}deg) scale(${currentZoom}) translate(${translateX}px, ${translateY}px)`;
+        
+        // Adjust dragging based on rotation
+        if (currentRotation % 180 !== 0) {
+          modalImage.style.maxWidth = '90vh';
+          modalImage.style.maxHeight = '90vw';
+        } else {
+          modalImage.style.maxWidth = '90vw';
+          modalImage.style.maxHeight = '90vh';
+        }
+      }
     }
-    
-    // Image zoom controls
+
+    // Enhanced drag functionality
+    let isDragging = false;
+    let startX, startY;
+    let initialTranslateX, initialTranslateY;
+
+    modalImage.addEventListener('mousedown', function(e) {
+      if (currentZoom > 1) {
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        initialTranslateX = translateX;
+        initialTranslateY = translateY;
+        modalImage.style.cursor = 'grabbing';
+        e.preventDefault();
+      }
+    });
+
+    document.addEventListener('mousemove', function(e) {
+      if (isDragging) {
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        
+        // Adjust translation based on rotation
+        const angle = currentRotation * Math.PI / 180;
+        translateX = initialTranslateX + (dx * Math.cos(angle) + dy * Math.sin(angle)) / currentZoom;
+        translateY = initialTranslateY + (-dx * Math.sin(angle) + dy * Math.cos(angle)) / currentZoom;
+        
+        updateImageTransform();
+      }
+    });
+
+    document.addEventListener('mouseup', function() {
+      if (isDragging) {
+        isDragging = false;
+        modalImage.style.cursor = 'move';
+      }
+    });
+
+    // Enhanced zoom controls
     zoomIn.onclick = function() {
-      currentZoom += 0.2;
-      if (currentZoom > 5) currentZoom = 5;
-      modalImage.style.transform = `scale(${currentZoom})`;
-    }
-    
+      currentZoom = Math.min(currentZoom + 0.2, 5);
+      updateImageTransform();
+    };
+
     zoomOut.onclick = function() {
-      currentZoom -= 0.2;
-      if (currentZoom < 0.5) currentZoom = 0.5;
-      modalImage.style.transform = `scale(${currentZoom})`;
-    }
-    
+      currentZoom = Math.max(currentZoom - 0.2, 0.5);
+      updateImageTransform();
+    };
+
     zoomReset.onclick = function() {
       currentZoom = 1;
-      modalImage.style.transform = `scale(${currentZoom})`;
-    }
-    
-    // Close modal when clicking outside media
+      currentRotation = 0;
+      translateX = 0;
+      translateY = 0;
+      updateImageTransform();
+    };
+
+    // Add wheel zoom support
+    mediaModal.addEventListener('wheel', function(e) {
+      if (modalImage.style.display === 'block') {
+        e.preventDefault();
+        const delta = e.deltaY * -0.01;
+        const newZoom = Math.max(0.5, Math.min(5, currentZoom + delta));
+        
+        // Calculate cursor position relative to image
+        const rect = modalImage.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        // Calculate new position to zoom towards cursor
+        const scale = newZoom / currentZoom;
+        translateX = x - (x - translateX) * scale;
+        translateY = y - (y - translateY) * scale;
+        
+        currentZoom = newZoom;
+        updateImageTransform();
+      }
+    });
+
+    // Close modal when clicking outside
     mediaModal.onclick = function(event) {
       if (event.target === mediaModal) {
         mediaModal.style.display = 'none';
         modalVideo.pause();
         modalVideo.currentTime = 0;
       }
-    }
-    
-    // Allow ESC key to close the modal
+    };
+
+    // Close on escape key
     document.addEventListener('keydown', function(event) {
       if (event.key === 'Escape' && mediaModal.style.display === 'block') {
         mediaModal.style.display = 'none';
         modalVideo.pause();
         modalVideo.currentTime = 0;
       }
-    });
-    
-    // Enable image dragging when zoomed
-    let isDragging = false;
-    let lastX, lastY;
-    let translateX = 0, translateY = 0;
-    
-    modalImage.onmousedown = function(e) {
-      if (currentZoom > 1) {
-        isDragging = true;
-        lastX = e.clientX;
-        lastY = e.clientY;
-        e.preventDefault();
-      }
-    };
-    
-    document.onmousemove = function(e) {
-      if (isDragging) {
-        const deltaX = e.clientX - lastX;
-        const deltaY = e.clientY - lastY;
-        lastX = e.clientX;
-        lastY = e.clientY;
-        
-        translateX += deltaX / currentZoom;
-        translateY += deltaY / currentZoom;
-        
-        modalImage.style.transform = `scale(${currentZoom}) translate(${translateX}px, ${translateY}px)`;
-      }
-    };
-    
-    document.onmouseup = function() {
-      isDragging = false;
-    };
-    
-    // Reset position when zoom is reset
-    zoomReset.addEventListener('click', function() {
-      translateX = 0;
-      translateY = 0;
     });
 
     // Search functionality
@@ -1556,6 +1599,71 @@
     
     // Initialize pinned messages on load
     updatePinnedMessages();
+
+    // Add typing indicator element
+    const typingIndicator = document.createElement('div');
+    typingIndicator.classList.add('typing-indicator');
+    messagesContainer.appendChild(typingIndicator);
+
+    // Add these event listeners after socket initialization
+    messageInput.addEventListener('input', () => {
+      if (!username) return;
+      
+      // Emit typing event
+      socket.emit('typing', username);
+      
+      // Clear existing timeout
+      clearTimeout(typingTimeout);
+      
+      // Set new timeout
+      typingTimeout = setTimeout(() => {
+        socket.emit('stop typing', username);
+      }, TYPING_TIMER_LENGTH);
+    });
+
+    messageInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        // Clear typing timeout and emit stop typing
+        clearTimeout(typingTimeout);
+        socket.emit('stop typing', username);
+      }
+    });
+
+    // Add these socket listeners
+    let currentlyTyping = new Set();
+
+    socket.on('typing', (user) => {
+      if (user === username) return; // Don't show own typing status
+      currentlyTyping.add(user);
+      updateTypingIndicator();
+    });
+
+    socket.on('stop typing', (user) => {
+      currentlyTyping.delete(user);
+      updateTypingIndicator();
+    });
+
+    function updateTypingIndicator() {
+      if (currentlyTyping.size === 0) {
+        typingIndicator.style.display = 'none';
+        typingIndicator.textContent = '';
+        return;
+      }
+
+      typingIndicator.style.display = 'block';
+      if (currentlyTyping.size === 1) {
+        typingIndicator.textContent = `${Array.from(currentlyTyping)[0]} is typing...`;
+      } else if (currentlyTyping.size === 2) {
+        typingIndicator.textContent = `${Array.from(currentlyTyping).join(' and ')} are typing...`;
+      } else {
+        typingIndicator.textContent = 'Several people are typing...';
+      }
+    }
+
+    // Add cleanup when user leaves
+    window.addEventListener('beforeunload', () => {
+      socket.emit('stop typing', username);
+    });
   </script>
 </body>
 </html>

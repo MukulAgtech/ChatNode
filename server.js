@@ -161,14 +161,14 @@ io.on('connection', (socket) => {
   socket.on('typing', () => {
     const username = users[socket.id];
     if (username) {
-      socket.broadcast.emit('user-typing', username);
+      socket.broadcast.emit('typing', username);
     }
   });
 
   socket.on('stop-typing', () => {
     const username = users[socket.id];
     if (username) {
-      socket.broadcast.emit('user-stop-typing', username);
+      socket.broadcast.emit('stop typing', username);
     }
   });
 
