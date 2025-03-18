@@ -371,17 +371,55 @@
       color: #f0f0f0;
     }
     .typing-indicator {
-      padding: 10px 15px;
-      color: #666;
-      font-style: italic;
-      display: none;
       position: fixed;
-      bottom: 70px;
-      left: 270px;
-      background-color: rgba(255, 255, 255, 0.9);
-      border-radius: 15px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      z-index: 10;
+      bottom: 85px;
+      left: 300px;
+      background: rgba(52, 152, 219, 0.15);
+      backdrop-filter: blur(8px);
+      padding: 8px 16px;
+      border-radius: 12px;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.9rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      animation: fadeInUp 0.3s ease;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .typing-indicator::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: #3498db;
+      border-radius: 50%;
+      display: inline-block;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% {
+        transform: scale(0.8);
+        opacity: 0.5;
+      }
+      50% {
+        transform: scale(1.2);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+      }
+    }
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     /* Media viewer styles */
     .media-preview {
@@ -521,20 +559,33 @@
       width: 100%;
     }
     .typing-indicator {
-      left: 15px;
+      left: 20px;
+      right: 20px;
       bottom: 80px;
-      max-width: calc(100% - 30px);
+      width: calc(100% - 40px);
+      justify-content: center;
     }
     }
+    /* Enhanced Search Container */
     .search-container {
       display: flex;
       align-items: center;
       gap: 10px;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.08);
       border-radius: 12px;
       padding: 8px 15px;
       backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
     }
+
+    .search-container:focus-within {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(52, 152, 219, 0.5);
+      box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+    }
+
     #searchInput {
       background: transparent;
       border: none;
@@ -542,46 +593,68 @@
       padding: 8px;
       width: 200px;
       font-size: 14px;
+      transition: all 0.3s ease;
     }
+
     #searchInput::placeholder {
-      color: rgba(255, 255, 255, 0.5);
+      color: rgba(255, 255, 255, 0.4);
+      transition: color 0.3s ease;
     }
+
+    #searchInput:focus::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    #searchInput:focus {
+      outline: none;
+    }
+
     #searchPrev, #searchNext {
-      background: none;
+      background: rgba(255, 255, 255, 0.08);
       border: none;
       color: white;
       cursor: pointer;
-      padding: 5px 10px;
+      padding: 8px 12px;
       border-radius: 8px;
       transition: all 0.3s ease;
+      font-size: 14px;
     }
+
     #searchPrev:hover, #searchNext:hover {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-1px);
     }
+
+    #searchPrev:active, #searchNext:active {
+      transform: translateY(0);
+    }
+
     #searchCount {
-      color: #666;
+      color: rgba(255, 255, 255, 0.6);
       font-size: 12px;
       margin-left: 5px;
+      padding: 4px 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
     }
-    .message.highlighted {
-      background-color: rgba(255, 255, 0, 0.279) !important;
-      color: black !important;
-    }
-    .message.current-match {
-      background-color: rgba(255, 255, 0, 0.603) !important;
-      color: black !important;
-    }
+
+    /* Mobile Responsiveness for Search and Typing */
     @media (max-width: 768px) {
-      .chat-header {
-        flex-direction: column;
-        gap: 10px;
-      }
       .search-container {
         width: 100%;
-        justify-content: center;
+        margin: 10px 0;
       }
+
       #searchInput {
         width: 100%;
+      }
+
+      .typing-indicator {
+        left: 20px;
+        right: 20px;
+        bottom: 80px;
+        width: calc(100% - 40px);
+        justify-content: center;
       }
     }
     /* Pin feature styles */
@@ -725,6 +798,10 @@
       <div class="messages" id="messagesContainer">
         <div class="loading" id="loadingIndicator">Loading message history...</div>
       </div>
+      
+      <!-- Add this line for typing indicator -->
+      <div class="typing-indicator" id="typingIndicator" style="display: none;"></div>
+      
       <div class="input-area">
         <input type="text" class="message-input" id="messageInput" placeholder="Type a message...">
         <label class="file-button">
@@ -768,7 +845,6 @@
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
-    // Connect to Socket.io server
     const socket = io();
     
     // DOM elements
@@ -904,6 +980,9 @@
       if (message && username) {
         socket.emit('chat-message', message);
         messageInput.value = '';
+        // Clear typing status
+        typing = false;
+        socket.emit('stop-typing');
       }
     }
     
@@ -1693,43 +1772,51 @@
     updatePinnedMessages();
 
     // Add typing indicator element
-    const typingIndicator = document.createElement('div');
-    typingIndicator.classList.add('typing-indicator');
-    messagesContainer.appendChild(typingIndicator);
-
-    // Constants for typing indicator
+    const typingIndicator = document.getElementById('typingIndicator');
     const TYPING_TIMER_LENGTH = 3000; // 3 seconds
-    let typingTimeout;
-    let currentlyTyping = new Set();
+    let typing = false;
+    let lastTypingTime;
 
-    // Add these socket listeners if they don't exist
+    // Add typing event listeners to message input
+    messageInput.addEventListener('input', () => {
+      updateTyping();
+    });
+
+    messageInput.addEventListener('keydown', () => {
+      updateTyping();
+    });
+
+    // Function to handle typing updates
+    function updateTyping() {
+      if (!typing) {
+        typing = true;
+        socket.emit('typing');
+      }
+      lastTypingTime = new Date().getTime();
+
+      setTimeout(() => {
+        const timeNow = new Date().getTime();
+        const timeDiff = timeNow - lastTypingTime;
+        if (timeDiff >= TYPING_TIMER_LENGTH && typing) {
+          socket.emit('stop-typing');
+          typing = false;
+        }
+      }, TYPING_TIMER_LENGTH);
+    }
+
+    // Socket events for typing indicators
     socket.on('typing', (user) => {
-      if (user === username) return; // Don't show own typing status
-      currentlyTyping.add(user);
-      updateTypingIndicator();
+      if (user !== username) {
+        typingIndicator.textContent = `${user} is typing...`;
+        typingIndicator.style.display = 'flex';
+      }
     });
 
     socket.on('stop typing', (user) => {
-      currentlyTyping.delete(user);
-      updateTypingIndicator();
-    });
-
-    function updateTypingIndicator() {
-      if (currentlyTyping.size === 0) {
+      if (user !== username) {
         typingIndicator.style.display = 'none';
-        typingIndicator.textContent = '';
-        return;
       }
-
-      typingIndicator.style.display = 'block';
-      if (currentlyTyping.size === 1) {
-        typingIndicator.textContent = `${Array.from(currentlyTyping)[0]} is typing...`;
-      } else if (currentlyTyping.size === 2) {
-        typingIndicator.textContent = `${Array.from(currentlyTyping).join(' and ')} are typing...`;
-      } else {
-        typingIndicator.textContent = 'Several people are typing...';
-      }
-    }
+    });
 
     // Add cleanup when user leaves
     window.addEventListener('beforeunload', () => {
