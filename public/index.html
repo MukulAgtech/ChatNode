@@ -746,11 +746,17 @@
     
     // Socket events
     socket.on('user-joined', (user) => {
+      addSystemMessage(`${user} joined the chat`);
       updateUsersList();
+      // Request updated user list
+      socket.emit('get-users');
     });
     
     socket.on('user-left', (user) => {
+      addSystemMessage(`${user} left the chat`);
       updateUsersList();
+      // Request updated user list
+      socket.emit('get-users');
     });
     
     socket.on('users-list', (users) => {
@@ -1605,33 +1611,12 @@
     typingIndicator.classList.add('typing-indicator');
     messagesContainer.appendChild(typingIndicator);
 
-    // Add these event listeners after socket initialization
-    messageInput.addEventListener('input', () => {
-      if (!username) return;
-      
-      // Emit typing event
-      socket.emit('typing', username);
-      
-      // Clear existing timeout
-      clearTimeout(typingTimeout);
-      
-      // Set new timeout
-      typingTimeout = setTimeout(() => {
-        socket.emit('stop typing', username);
-      }, TYPING_TIMER_LENGTH);
-    });
-
-    messageInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        // Clear typing timeout and emit stop typing
-        clearTimeout(typingTimeout);
-        socket.emit('stop typing', username);
-      }
-    });
-
-    // Add these socket listeners
+    // Constants for typing indicator
+    const TYPING_TIMER_LENGTH = 3000; // 3 seconds
+    let typingTimeout;
     let currentlyTyping = new Set();
 
+    // Add these socket listeners if they don't exist
     socket.on('typing', (user) => {
       if (user === username) return; // Don't show own typing status
       currentlyTyping.add(user);
