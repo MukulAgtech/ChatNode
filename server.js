@@ -63,17 +63,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(UPLOADS_DIR));
 
 app.get("/git-pull", (req, res) => {
-  exec("git pull origin main", (error, stdout, stderr) => {
+  exec("git pull origin main 2>&1",{ shell: true }, (error, stdout) => {
+    console.log("error",error);
+    console.log("stdout",stdout);
     if (error) {
       console.error(`Error: ${error.message}`);
       return res.status(500).send(`Error: ${error.message}`);
     }
-    if (stderr) {
-      console.error(`Stderr: ${stderr}`);
-      return res.status(500).send(`Stderr: ${stderr}`);
-    }
     console.log(`Stdout: ${stdout}`);
-    res.send(`Git pull successful:\n${stdout}`);
+    res.send(`Git pull successful:<br><pre>${stdout}</pre>`);
   });
 });
 
