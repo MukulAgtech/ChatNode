@@ -134,10 +134,17 @@ io.on('connection', (socket) => {
     
     socket.broadcast.emit('user-joined', username);
     socket.broadcast.emit('system-message', joinMessage);
-    socket.emit('users-list', Object.values(users));
+    
+    // Send updated users list to ALL clients
+    io.emit('users-list', Object.values(users));
     
     // Send message history to new user
     socket.emit('message-history', messages.slice(-50)); // Send last 50 messages
+  });
+
+  // Add this new handler for get-users
+  socket.on('get-users', () => {
+    socket.emit('users-list', Object.values(users));
   });
 
   // Handle chat messages
@@ -190,6 +197,9 @@ io.on('connection', (socket) => {
       socket.broadcast.emit('user-left', username);
       socket.broadcast.emit('system-message', leaveMessage);
       delete users[socket.id];
+      
+      // Send updated users list to ALL remaining clients
+      io.emit('users-list', Object.values(users));
     }
   });
 });
