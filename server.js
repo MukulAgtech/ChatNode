@@ -6,6 +6,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
+const { exec } = require('child_process');
 
 // Initialize Express app
 const app = express();
@@ -60,6 +61,21 @@ const upload = multer({ storage: storage });
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(UPLOADS_DIR));
+
+app.get("/git-pull", (req, res) => {
+  exec("git pull origin main", (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error: ${error.message}`);
+      return res.status(500).send(`Error: ${error.message}`);
+    }
+    if (stderr) {
+      console.error(`Stderr: ${stderr}`);
+      return res.status(500).send(`Stderr: ${stderr}`);
+    }
+    console.log(`Stdout: ${stdout}`);
+    res.send(`Git pull successful:\n${stdout}`);
+  });
+});
 
 // Set up routes
 app.get('/', (req, res) => {
