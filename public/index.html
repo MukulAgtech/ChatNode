@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +12,7 @@
       box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
+
     body {
       display: flex;
       flex-direction: column;
@@ -18,6 +20,7 @@
       background-color: #1a1a1a;
       color: #fff;
     }
+
     /* Add drag-and-drop styles */
     .body-dragover {
       background-color: rgba(52, 152, 219, 0.1);
@@ -25,6 +28,7 @@
       outline-offset: -10px;
       position: relative;
     }
+
     body.body-dragover:before {
       content: '';
       position: fixed;
@@ -32,6 +36,7 @@
       inset: 10px;
       z-index: 9;
     }
+
     .body-dragover::after {
       content: 'Drop file to upload';
       position: fixed;
@@ -42,6 +47,7 @@
       color: #000000;
       pointer-events: none;
     }
+
     .login-container {
       position: fixed;
       top: 0;
@@ -54,6 +60,7 @@
       align-items: center;
       z-index: 1000;
     }
+
     .login-form {
       background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(10px);
@@ -64,12 +71,14 @@
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
+
     .login-form h2 {
       margin-bottom: 30px;
       color: #fff;
       font-size: 28px;
       font-weight: 600;
     }
+
     .login-form input {
       width: 100%;
       padding: 15px;
@@ -81,11 +90,13 @@
       font-size: 16px;
       transition: all 0.3s ease;
     }
+
     .login-form input:focus {
       outline: none;
       background: rgba(255, 255, 255, 0.2);
       box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
     }
+
     .login-form button {
       width: 100%;
       padding: 15px;
@@ -100,16 +111,19 @@
       text-transform: uppercase;
       letter-spacing: 1px;
     }
+
     .login-form button:hover {
       background: #2980b9;
       transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     }
+
     .container {
       display: flex;
       flex: 1;
       overflow: hidden;
     }
+
     .sidebar {
       width: 280px;
       background: linear-gradient(180deg, #2c3e50 0%, #1a1a1a 100%);
@@ -119,6 +133,7 @@
       flex-direction: column;
       border-right: 1px solid rgba(255, 255, 255, 0.1);
     }
+
     .sidebar h2 {
       margin-bottom: 20px;
       font-size: 1.4rem;
@@ -126,10 +141,12 @@
       padding-bottom: 15px;
       border-bottom: 2px solid #3498db;
     }
+
     .users-list {
       flex: 1;
       overflow-y: auto;
     }
+
     .user-item {
       padding: 12px 15px;
       margin-bottom: 8px;
@@ -139,10 +156,12 @@
       display: flex;
       align-items: center;
     }
+
     .user-item:hover {
       background: rgba(255, 255, 255, 0.1);
       transform: translateX(5px);
     }
+
     .user-status {
       width: 12px;
       height: 12px;
@@ -151,12 +170,14 @@
       margin-right: 12px;
       box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
     }
+
     .main {
       flex: 1;
       display: flex;
       flex-direction: column;
       background-color: #2c3e50;
     }
+
     .chat-header {
       padding: 20px;
       background: linear-gradient(90deg, #3498db, #2980b9);
@@ -166,20 +187,23 @@
       align-items: center;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
+
     .chat-header h2 {
       font-size: 1.2rem;
     }
+
     .messages {
       flex: 1;
       padding: 20px;
       overflow-y: auto;
       background-color: #1a1a1a;
-      background-image: 
+      background-image:
         radial-gradient(circle at 25px 25px, rgba(255, 255, 255, 0.2) 2%, transparent 0%),
         radial-gradient(circle at 75px 75px, rgba(255, 255, 255, 0.2) 2%, transparent 0%);
       background-size: 100px 100px;
       margin-bottom: 69px;
     }
+
     .message {
       margin-bottom: 20px;
       padding: 15px;
@@ -189,46 +213,56 @@
       position: relative;
       animation: messageAppear 0.3s ease;
     }
+
     @keyframes messageAppear {
       from {
         opacity: 0;
         transform: translateY(20px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
+
     .message.received {
       background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
       color: white;
       margin-right: auto;
     }
+
     .message.sent {
       background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
       color: white;
       margin-left: auto;
     }
+
     .message-username {
       font-weight: bold;
       margin-bottom: 5px;
       font-size: 0.9rem;
     }
+
     .sent .message-username {
       color: #f0f0f0;
     }
+
     .message-text {
       word-break: break-word;
     }
+
     .message-time {
       text-align: right;
       font-size: 0.7rem;
       color: #777;
       margin-top: 5px;
     }
+
     .sent .message-time {
       color: #f0f0f0;
     }
+
     .input-area {
       padding: 20px;
       background: rgba(26, 26, 26, 0.95);
@@ -240,6 +274,7 @@
       bottom: 0;
       width: calc(100% - 280px);
     }
+
     .message-input {
       flex: 1;
       padding: 15px;
@@ -250,12 +285,15 @@
       font-size: 16px;
       transition: all 0.3s ease;
     }
+
     .message-input:focus {
       outline: none;
       background: rgba(255, 255, 255, 0.15);
       box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
     }
-    .send-button, .file-button {
+
+    .send-button,
+    .file-button {
       padding: 15px 25px;
       background: #3498db;
       color: white;
@@ -268,15 +306,19 @@
       align-items: center;
       gap: 8px;
     }
-    .send-button:hover, .file-button:hover {
+
+    .send-button:hover,
+    .file-button:hover {
       background: #2980b9;
       transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     }
+
     .file-button {
       position: relative;
       overflow: hidden;
     }
+
     .file-input {
       position: absolute;
       top: 0;
@@ -286,15 +328,18 @@
       height: 100%;
       cursor: pointer;
     }
+
     .file-message {
       background-color: #e1f5fe;
       padding: 10px;
       border-radius: 5px;
       margin-top: 5px;
     }
+
     .sent .file-message {
       background-color: #2980b9;
     }
+
     .file-link {
       color: #3498db;
       text-decoration: none;
@@ -306,13 +351,16 @@
       text-align: center;
       transition: background-color 0.3s;
     }
+
     .file-link:hover {
       background-color: #f1f1f1;
     }
+
     .sent .file-link {
       background-color: #f9f9f9;
       color: #3498db;
     }
+
     .system-message {
       text-align: center;
       margin: 15px 0;
@@ -324,26 +372,31 @@
       backdrop-filter: blur(5px);
       animation: systemMessage 0.5s ease;
     }
+
     @keyframes systemMessage {
       from {
         opacity: 0;
         transform: scale(0.9);
       }
+
       to {
         opacity: 1;
         transform: scale(1);
       }
     }
+
     .loading {
       text-align: center;
       padding: 20px;
       color: #7f8c8d;
     }
+
     .date-divider {
       text-align: center;
       margin: 20px 0;
       position: relative;
     }
+
     .date-divider::before {
       content: '';
       position: absolute;
@@ -354,6 +407,7 @@
       background-color: #ddd;
       z-index: 1;
     }
+
     .date-divider span {
       background-color: #ecf0f1;
       padding: 0 10px;
@@ -362,14 +416,17 @@
       color: #7f8c8d;
       font-size: 0.8rem;
     }
+
     .message-status {
       text-align: right;
       font-size: 0.7rem;
       margin-top: 2px;
     }
+
     .sent .message-status {
       color: #f0f0f0;
     }
+
     .typing-indicator {
       position: fixed;
       bottom: 85px;
@@ -388,6 +445,7 @@
       align-items: center;
       gap: 8px;
     }
+
     .typing-indicator::before {
       content: '';
       width: 8px;
@@ -397,30 +455,36 @@
       display: inline-block;
       animation: pulse 1.5s infinite;
     }
+
     @keyframes pulse {
       0% {
         transform: scale(0.8);
         opacity: 0.5;
       }
+
       50% {
         transform: scale(1.2);
         opacity: 1;
       }
+
       100% {
         transform: scale(0.8);
         opacity: 0.5;
       }
     }
+
     @keyframes fadeInUp {
       from {
         opacity: 0;
         transform: translateY(10px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
+
     /* Media viewer styles */
     .media-preview {
       max-width: 100%;
@@ -429,6 +493,7 @@
       border-radius: 4px;
       border: 1px solid #ddd;
     }
+
     .video-thumbnail {
       width: 100%;
       max-width: 300px;
@@ -438,6 +503,7 @@
       background-position: center;
       position: relative;
     }
+
     .video-thumbnail::after {
       content: '▶';
       position: absolute;
@@ -453,6 +519,7 @@
       line-height: 40px;
       font-size: 18px;
     }
+
     .video-container {
       position: absolute;
       top: 50%;
@@ -461,11 +528,13 @@
       width: 80%;
       max-width: 900px;
     }
+
     #modalVideo {
       width: 100%;
       max-height: 90vh;
       background-color: #000;
     }
+
     .media-modal {
       display: none;
       position: fixed;
@@ -479,6 +548,7 @@
       justify-content: center;
       align-items: center;
     }
+
     .modal-content {
       max-width: 90%;
       max-height: 90vh;
@@ -490,12 +560,14 @@
       left: 0;
       top: 0;
     }
+
     #modalImage {
       cursor: move;
       display: block;
       margin: auto;
       transform-origin: center center;
     }
+
     .media-controls {
       position: fixed;
       bottom: 20px;
@@ -508,6 +580,7 @@
       gap: 10px;
       z-index: 1120;
     }
+
     .control-btn {
       color: white;
       background: rgba(255, 255, 255, 0.2);
@@ -519,9 +592,11 @@
       min-width: 40px;
       text-align: center;
     }
+
     .control-btn:hover {
       background: rgba(255, 255, 255, 0.3);
     }
+
     .video-controls {
       width: 100%;
       position: absolute;
@@ -535,122 +610,347 @@
       opacity: 0;
       transition: opacity 0.3s;
     }
+
     .video-container:hover .video-controls {
       opacity: 1;
     }
-    
+
     /* Responsive styles - carefully preserving the current design */
+    /* Enhanced Responsive Styles */
+
+    /* Base responsive layout improvements */
     @media (max-width: 768px) {
       .container {
         flex-direction: column;
       }
-      
+
       .sidebar {
         width: 100%;
         max-height: 150px;
         overflow-y: auto;
+        position: relative;
+        /* Fix position for mobile */
+        left: 0;
+        /* Reset the left position */
+        height: auto;
+        /* Reset fixed height */
+        box-shadow: none;
+        /* Remove box shadow */
+        transition: none;
+        /* Remove transition */
       }
-      
+
       .main {
         height: calc(100vh - 150px);
-      }
-      
-      .input-area {
-        left: 0;
         width: 100%;
-        padding: 15px;
+        /* Ensure full width */
       }
-      
+
+      .input-area {
+        width: 100%;
+        /* Full width on mobile */
+        left: 0;
+        padding: 15px;
+        box-sizing: border-box;
+      }
+
       .typing-indicator {
         left: 20px;
         bottom: 80px;
       }
-      
+
       .messages {
         margin-bottom: 70px;
-      }
-      
-      .chat-header {
         padding: 15px;
+        /* Reduce padding on mobile */
       }
-      
+
+      .chat-header {
+        padding: 12px 15px;
+        flex-wrap: wrap;
+        /* Allow wrapping on small screens */
+      }
+
+      .header-controls {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
       .search-container {
-        max-width: 200px;
+        max-width: 100%;
+        /* Full width search on mobile */
+        width: 100%;
+        margin-top: 10px;
       }
-      
+
       .message {
         max-width: 85%;
+        padding: 12px;
+        /* Slightly smaller padding */
+      }
+
+      /* Fix hamburger menu position */
+      .hamburger-menu {
+        position: relative;
+        z-index: 200;
+        margin-right: 0;
+      }
+
+      /* Improve mobile overlay behavior */
+      .mobile-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 150;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+        /* Fix for overlay clicks */
+      }
+
+      .mobile-overlay.active {
+        opacity: 1;
+        pointer-events: auto;
+        /* Enable clicks when active */
+        display: block;
       }
     }
-    
+
     /* Small phones */
     @media (max-width: 480px) {
       .chat-header {
-        flex-wrap: wrap;
-        gap: 10px;
+        padding: 10px;
       }
-      
+
       .chat-header h2 {
-        width: 100%;
-        margin-bottom: 10px;
+        font-size: 1.1rem;
       }
-      
-      .search-container {
-        max-width: 100%;
-        width: 100%;
+
+      .send-button,
+      .file-button {
+        padding: 12px;
+        /* Smaller buttons on small phones */
+        font-size: 14px;
+        /* Smaller font */
       }
-      
-      #searchInput {
-        width: 100%;
-      }
-      
-      .send-button, .file-button {
-        padding: 15px;
-      }
-      
-      .sidebar {
-        max-height: 120px;
-      }
-      
-      .main {
-        height: calc(100vh - 120px);
-      }
-    }
-    
-    /* Landscape mode on mobile */
-    @media (max-height: 500px) and (orientation: landscape) {
+
       .sidebar {
         max-height: 100px;
+        /* Even smaller sidebar on phones */
+        padding: 15px;
       }
-      
+
       .main {
         height: calc(100vh - 100px);
       }
-      
-      .input-area {
-        padding: 10px;
-      }
-      
+
       .message-input {
-        padding: 10px;
+        padding: 12px;
+        /* Smaller input field */
+        font-size: 15px;
+        /* Slightly smaller font */
       }
-      
-      .send-button, .file-button {
-        padding: 10px 15px;
+
+      .user-item {
+        padding: 8px 10px;
+        /* Smaller user items */
+        margin-bottom: 5px;
       }
-      
+
+      /* Make menu panel take full width on very small screens */
+      .mobile-menu-panel {
+        width: 85%;
+        right: -85%;
+      }
+
+      /* Fix scrolling issues on small screens */
       .messages {
-        margin-bottom: 60px;
+        -webkit-overflow-scrolling: touch;
+        /* Smooth scrolling on iOS */
+      }
+
+      /* Adjust media modal for small screens */
+      .modal-content {
+        max-width: 95%;
+      }
+
+      /* Reduce search control size */
+      #searchPrev,
+      #searchNext {
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+
+      /* Make search input more touch-friendly */
+      #searchInput {
+        padding: 10px;
+        font-size: 15px;
       }
     }
-    
-    /* Fix for notched phones */
+
+    /* Landscape mode on mobile */
+    @media (max-height: 500px) and (orientation: landscape) {
+      .sidebar {
+        max-height: 80px;
+        /* Even smaller in landscape */
+      }
+
+      .main {
+        height: calc(100vh - 80px);
+      }
+
+      .input-area {
+        padding: 8px 10px;
+      }
+
+      .message-input {
+        padding: 8px;
+      }
+
+      .send-button,
+      .file-button {
+        padding: 8px 12px;
+      }
+
+      .messages {
+        margin-bottom: 50px;
+        padding: 10px;
+      }
+
+      /* Adjust modal for landscape */
+      .modal-content {
+        max-height: 80vh;
+      }
+
+      /* Fix side panel */
+      .mobile-menu-panel {
+        padding: 15px;
+        overflow-y: auto;
+      }
+
+      .chat-header {
+        padding: 8px 12px;
+      }
+
+      /* Prevent content from being hidden under keyboard */
+      .input-area {
+        position: absolute;
+      }
+    }
+
+    /* Tablet-specific improvements */
+    @media (min-width: 481px) and (max-width: 768px) {
+      .sidebar {
+        max-height: 120px;
+      }
+
+      .main {
+        height: calc(100vh - 120px);
+      }
+
+      /* Improve layout for tablets */
+      .chat-header {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 15px;
+        align-items: center;
+      }
+
+      .header-controls {
+        width: auto;
+        margin-bottom: 0;
+      }
+
+      .search-container {
+        margin-top: 0;
+      }
+
+      /* Better message display on mid-sized screens */
+      .message {
+        max-width: 80%;
+      }
+    }
+
+    /* Fix for iOS notched phones */
     @supports (padding-bottom: env(safe-area-inset-bottom)) {
       .input-area {
-        padding-bottom: calc(15px + env(safe-area-inset-bottom));
+        padding-bottom: calc(20px + env(safe-area-inset-bottom));
+      }
+
+      /* Adjust modal bottom controls for notched phones */
+      .media-controls {
+        bottom: calc(20px + env(safe-area-inset-bottom));
       }
     }
-    
+
+    /* Fix for iPhone rotation */
+    @media screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3),
+    screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3),
+    screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+      body {
+        height: -webkit-fill-available;
+      }
+
+      .container {
+        height: -webkit-fill-available;
+      }
+    }
+
+    /* Fix for the sidebar menu interaction on mobile */
+    @media (max-width: 768px) {
+      .sidebar {
+        z-index: 160;
+        transition: transform 0.3s ease;
+        transform: translateX(-100%);
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 250px;
+        max-height: none;
+      }
+
+      .sidebar.active {
+        transform: translateX(0);
+      }
+
+      /* Ensure main content takes full space when sidebar is hidden */
+      .main {
+        width: 100%;
+        height: 100vh;
+      }
+
+      /* Fix hamburger menu styling */
+      .hamburger-menu {
+        display: flex;
+        margin-left: 15px;
+      }
+    }
+
+    /* Fix input area on different browsers */
+    @media (max-width: 768px) {
+      .input-area {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        z-index: 90;
+      }
+
+      /* Ensure messages don't get hidden behind the input */
+      .messages {
+        padding-bottom: 90px;
+      }
+    }
+
     /* Enhanced Search Container */
     .search-container {
       display: flex;
@@ -694,7 +994,8 @@
       outline: none;
     }
 
-    #searchPrev, #searchNext {
+    #searchPrev,
+    #searchNext {
       background: rgba(255, 255, 255, 0.08);
       border: none;
       color: white;
@@ -705,12 +1006,14 @@
       font-size: 14px;
     }
 
-    #searchPrev:hover, #searchNext:hover {
+    #searchPrev:hover,
+    #searchNext:hover {
       background: rgba(255, 255, 255, 0.15);
       transform: translateY(-1px);
     }
 
-    #searchPrev:active, #searchNext:active {
+    #searchPrev:active,
+    #searchNext:active {
       transform: translateY(0);
     }
 
@@ -734,13 +1037,16 @@
       opacity: 0;
       transition: opacity 0.2s, color 0.2s;
     }
+
     .message:hover .pin-button {
       opacity: 1;
     }
+
     .pin-button.pinned {
       color: #e74c3c;
       opacity: 1;
     }
+
     .pinned-messages-container {
       position: fixed;
       top: 15px;
@@ -754,6 +1060,7 @@
       overflow: hidden;
       display: none;
     }
+
     .pinned-header {
       background-color: #3498db;
       color: white;
@@ -762,29 +1069,35 @@
       justify-content: space-between;
       align-items: center;
     }
+
     .close-pinned {
       cursor: pointer;
       font-weight: bold;
     }
+
     .pinned-list {
       max-height: 350px;
       overflow-y: auto;
       padding: 10px;
     }
+
     .pinned-item {
       padding: 10px;
       border-bottom: 1px solid #eee;
       cursor: pointer;
       transition: background-color 0.2s;
     }
+
     .pinned-item:hover {
       background-color: #f5f5f5;
     }
+
     .pinned-username {
       font-weight: bold;
       font-size: 0.9rem;
       margin-bottom: 3px;
     }
+
     .pinned-text {
       font-size: 0.9rem;
       color: #333;
@@ -792,6 +1105,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
     .pin-count-button {
       background-color: #e74c3c;
       color: white;
@@ -808,9 +1122,11 @@
       font-weight: bold;
       display: none;
     }
+
     .message {
       position: relative;
     }
+
     @media (max-width: 768px) {
       .pinned-messages-container {
         width: 80%;
@@ -820,20 +1136,25 @@
         transform: translate(-50%, -50%);
       }
     }
+
     /* Scrollbar Styling */
     ::-webkit-scrollbar {
       width: 8px;
     }
+
     ::-webkit-scrollbar-track {
       background: rgba(255, 255, 255, 0.1);
     }
+
     ::-webkit-scrollbar-thumb {
       background: rgba(52, 152, 219, 0.5);
       border-radius: 4px;
     }
+
     ::-webkit-scrollbar-thumb:hover {
       background: rgba(52, 152, 219, 0.7);
     }
+
     /* Enhanced hamburger menu styles */
     .hamburger-menu {
       display: none;
@@ -971,18 +1292,18 @@
       .hamburger-menu {
         display: flex;
       }
-      
+
       .mobile-menu-panel.active {
         display: flex;
         right: 0;
       }
-      
+
       .mobile-overlay.active {
         display: block;
         opacity: 1;
         pointer-events: auto;
       }
-      
+
       .sidebar {
         position: fixed;
         top: 0;
@@ -993,13 +1314,169 @@
         transition: left 0.3s ease;
         box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2);
       }
-      
+
       .sidebar.active {
         left: 0;
       }
     }
+
+    /* Text formatting functionality */
+    function formatMessage(text) {
+      if (!text) return '';
+      
+      // Replace line breaks
+      let formattedText = text.replace(/\n/g, '<br>');
+      
+      // Bold: **text** or __text__
+      formattedText = formattedText.replace(/(\*\*|__)(.*?)\1/g, '<strong>$2</strong>');
+      
+      // Italic: *text* or _text_
+      formattedText = formattedText.replace(/(\*|_)(.*?)\1/g, '<em>$2</em>');
+      
+      // Strikethrough: ~~text~~
+      formattedText = formattedText.replace(/~~(.*?)~~/g, '<del>$1</del>');
+      
+      // Code: `text`
+      formattedText = formattedText.replace(/`(.*?)`/g, '<code>$1</code>');
+      
+      // Links: [text](url)
+      formattedText = formattedText.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+      
+      return formattedText;
+    }
+
+    /* Handle shift+enter for new line */
+    messageInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        if (e.shiftKey) {
+          // Insert new line instead of sending
+          e.preventDefault();
+          const cursorPos = messageInput.selectionStart;
+          const text = messageInput.value;
+          messageInput.value = text.substring(0, cursorPos) + '\n' + text.substring(cursorPos);
+          
+          // Move cursor position after the inserted new line
+          setTimeout(() => {
+            messageInput.selectionStart = messageInput.selectionEnd = cursorPos + 1;
+          }, 0);
+        } else {
+          // Regular Enter key sends the message
+          e.preventDefault();
+          sendMessage();
+        }
+      }
+    });
+
+    /* Add CSS for formatted text */
+    const style = document.createElement('style');
+    style.textContent = `
+      .message-text {
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      .message-text strong {
+        font-weight: bold;
+      }
+      .message-text em {
+        font-style: italic;
+      }
+      .message-text del {
+        text-decoration: line-through;
+      }
+      .message-text code {
+        font-family: monospace;
+        background-color: rgba(0, 0, 0, 0.1);
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-size: 0.9em;
+      }
+      .message-text a {
+        color: #3498db;
+        text-decoration: underline;
+      }
+      .formatting-help {
+        position: absolute;
+        right: 10px;
+        bottom: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        display: none;
+        z-index: 100;
+      }
+      .formatting-help-button {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        color: #999;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      .formatting-help table {
+        border-collapse: collapse;
+      }
+      .formatting-help td {
+        padding: 4px 8px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .formatting-help code {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 1px 3px;
+        border-radius: 3px;
+      }
+    `;
+    document.head.appendChild(style);
+
+    /* Modify the addMessage function to use formatted text */
+    function addMessage(data) {
+      // ... existing code ...
+      
+      const textDiv = document.createElement('div');
+      textDiv.classList.add('message-text');
+      textDiv.innerHTML = formatMessage(data.message); // Use innerHTML instead of textContent
+      
+      // ... rest of existing code ...
+    }
+
+    /* Add formatting help button and panel */
+    const inputArea = document.querySelector('.input-area');
+    const helpButton = document.createElement('div');
+    helpButton.classList.add('formatting-help-button');
+    helpButton.textContent = '?';
+    helpButton.title = 'Formatting Help';
+
+    const helpPanel = document.createElement('div');
+    helpPanel.classList.add('formatting-help');
+    helpPanel.innerHTML = `
+      <h4>Text Formatting</h4>
+      <table>
+        <tr><td><code>**bold**</code></td><td>→</td><td><strong>bold</strong></td></tr>
+        <tr><td><code>*italic*</code></td><td>→</td><td><em>italic</em></td></tr>
+        <tr><td><code>~~strike~~</code></td><td>→</td><td><del>strike</del></td></tr>
+        <tr><td><code>\`code\`</code></td><td>→</td><td><code>code</code></td></tr>
+        <tr><td><code>[link](url)</code></td><td>→</td><td><a href="#">link</a></td></tr>
+        <tr><td>Shift+Enter</td><td>→</td><td>New line</td></tr>
+      </table>
+    `;
+
+    inputArea.appendChild(helpButton);
+    inputArea.appendChild(helpPanel);
+
+    helpButton.addEventListener('click', () => {
+      helpPanel.style.display = helpPanel.style.display === 'block' ? 'none' : 'block';
+    });
+
+    /* Click outside to close help panel */
+    document.addEventListener('click', (e) => {
+      if (e.target !== helpButton && !helpPanel.contains(e.target)) {
+        helpPanel.style.display = 'none';
+      }
+    });
   </style>
 </head>
+
 <body>
   <div class="login-container" id="loginContainer">
     <div class="login-form">
@@ -1035,10 +1512,10 @@
       <div class="messages" id="messagesContainer">
         <div class="loading" id="loadingIndicator">Loading message history...</div>
       </div>
-      
+
       <!-- Add this line for typing indicator -->
       <div class="typing-indicator" id="typingIndicator" style="display: none;"></div>
-      
+
       <div class="input-area">
         <input type="text" class="message-input" id="messageInput" placeholder="Type a message...">
         <label class="file-button">
@@ -1063,7 +1540,7 @@
   <!-- Media Modal -->
   <div id="mediaModal" class="media-modal">
     <span class="close-modal" id="closeModal">&times;</span>
-    
+
     <!-- Image Viewer -->
     <img class="modal-content" id="modalImage" style="display: none;">
     <div id="imageControls" class="media-controls" style="display: none;">
@@ -1071,7 +1548,7 @@
       <button class="control-btn" id="zoomOut" title="Zoom Out">-</button>
       <button class="control-btn" id="zoomReset" title="Reset">⟲</button>
     </div>
-    
+
     <!-- Video Player -->
     <div class="video-container" id="videoContainer" style="display: none;">
       <video id="modalVideo" class="modal-content" controls>
@@ -1086,9 +1563,8 @@
   <div class="mobile-menu-panel" id="mobileMenuPanel">
     <div class="mobile-menu-header">
       <h3>Menu</h3>
-      <button class="close-menu" id="closeMenu">×</button>
     </div>
-    
+
     <div class="mobile-menu-section">
       <h4>Options</h4>
       <div class="menu-options">
@@ -1102,7 +1578,7 @@
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
-    
+
     const loginContainer = document.getElementById('loginContainer');
     const usernameInput = document.getElementById('usernameInput');
     const joinButton = document.getElementById('joinButton');
@@ -1117,33 +1593,33 @@
     const pinnedList = document.getElementById('pinnedList');
     const pinCountButton = document.getElementById('pinCountButton');
     const closePinned = document.getElementById('closePinned');
-    
+
     let username = '';
     let lastMessageDate = null;
     let pinnedMessages = JSON.parse(localStorage.getItem('pinnedMessages') || '[]');
-    
+
     // Check for saved username in local storage
     const savedUsername = localStorage.getItem('lanMessengerUsername');
     if (savedUsername) {
       usernameInput.value = savedUsername;
     }
-    
+
     // Connection status handling
     socket.on('connect', () => {
       connectionStatus.textContent = 'Connected';
       connectionStatus.style.color = '#2ecc71';
-      
+
       // If we were already logged in before a reconnect
       if (username) {
         socket.emit('user-join', username);
       }
     });
-    
+
     socket.on('disconnect', () => {
       connectionStatus.textContent = 'Disconnected';
       connectionStatus.style.color = '#e74c3c';
     });
-    
+
     // Join chat when button is clicked
     joinButton.addEventListener('click', () => {
       username = usernameInput.value.trim();
@@ -1153,14 +1629,14 @@
         localStorage.setItem('lanMessengerUsername', username);
       }
     });
-    
+
     // Allow pressing Enter to join
     usernameInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
         joinButton.click();
       }
     });
-    
+
     // Socket events
     socket.on('user-joined', (user) => {
       addSystemMessage(`${user} joined the chat`);
@@ -1168,40 +1644,40 @@
       // Request updated user list
       socket.emit('get-users');
     });
-    
+
     socket.on('user-left', (user) => {
       addSystemMessage(`${user} left the chat`);
       updateUsersList();
       // Request updated user list
       socket.emit('get-users');
     });
-    
+
     socket.on('users-list', (users) => {
       updateUsersList(users);
     });
-    
+
     socket.on('chat-message', (data) => {
       addMessage(data);
     });
-    
+
     socket.on('new-file', (data) => {
       addFileMessage(data);
     });
-    
+
     socket.on('system-message', (data) => {
       addSystemMessage(data.message);
     });
-    
+
     socket.on('message-history', (messages) => {
       // Clear loading indicator
       loadingIndicator.style.display = 'none';
       messagesContainer.innerHTML = '';
-      
+
       if (messages.length === 0) {
         addSystemMessage('No message history yet. Start a conversation!');
         return;
       }
-      
+
       // Process message history
       messages.forEach(msg => {
         if (msg.type === 'chat') {
@@ -1212,23 +1688,23 @@
           addSystemMessage(msg.message);
         }
       });
-      
+
       scrollToBottom();
     });
-    
+
     // Send message when button is clicked
     sendButton.addEventListener('click', sendMessage);
-    
+
     // Allow pressing Enter to send message
     messageInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
         sendMessage();
       }
     });
-    
+
     // Handle file uploads
     fileInput.addEventListener('change', uploadFile);
-    
+
     // Functions
     function sendMessage() {
       const message = messageInput.value.trim();
@@ -1240,73 +1716,73 @@
         socket.emit('stop-typing', username);
       }
     }
-    
+
     function addMessage(data) {
       // Add date divider if needed
       checkAndAddDateDivider(data.timestamp);
-      
+
       const messageDiv = document.createElement('div');
       messageDiv.classList.add('message');
       messageDiv.classList.add(data.username === username ? 'sent' : 'received');
       messageDiv.setAttribute('data-message-id', data.id || '');
       messageDiv.setAttribute('data-timestamp', data.timestamp || Date.now());
-      
+
       const usernameDiv = document.createElement('div');
       usernameDiv.classList.add('message-username');
       usernameDiv.textContent = data.username;
-      
+
       const textDiv = document.createElement('div');
       textDiv.classList.add('message-text');
-      textDiv.textContent = data.message;
-      
+      textDiv.innerHTML = formatMessage(data.message); // Use innerHTML instead of textContent
+
       const timeDiv = document.createElement('div');
       timeDiv.classList.add('message-time');
       timeDiv.textContent = formatTime(data.timestamp);
-      
+
       // Add pin button
       const pinButton = document.createElement('div');
       pinButton.classList.add('pin-button');
       pinButton.innerHTML = '📌';
       pinButton.setAttribute('title', 'Pin this message');
-      pinButton.onclick = function(e) {
+      pinButton.onclick = function (e) {
         e.stopPropagation();
         togglePin(messageDiv, data);
       };
-      
+
       // Check if message is already pinned
-      const isPinned = pinnedMessages.some(msg => 
-        msg.id === data.id || 
+      const isPinned = pinnedMessages.some(msg =>
+        msg.id === data.id ||
         (msg.message === data.message && msg.username === data.username && msg.timestamp === data.timestamp)
       );
-      
+
       if (isPinned) {
         pinButton.classList.add('pinned');
       }
-      
+
       messageDiv.appendChild(pinButton);
       messageDiv.appendChild(usernameDiv);
       messageDiv.appendChild(textDiv);
       messageDiv.appendChild(timeDiv);
-      
+
       messagesContainer.appendChild(messageDiv);
       scrollToBottom();
     }
-    
+
     function togglePin(messageDiv, messageData) {
       // Create a unique ID for the message if it doesn't have one
       const messageId = messageData.id || `msg_${messageData.username}_${messageData.timestamp}`;
       const pinButton = messageDiv.querySelector('.pin-button');
-      
+
       // Check if message is already pinned
-      const isPinned = pinnedMessages.some(msg => 
-        msg.id === messageId || 
+      const isPinned = pinnedMessages.some(msg =>
+        msg.id === messageId ||
         (msg.message === messageData.message && msg.username === messageData.username && msg.timestamp === messageData.timestamp)
       );
-      
+
       if (isPinned) {
         // Unpin the message
-        pinnedMessages = pinnedMessages.filter(msg => 
-          !(msg.id === messageId || 
+        pinnedMessages = pinnedMessages.filter(msg =>
+          !(msg.id === messageId ||
             (msg.message === messageData.message && msg.username === messageData.username && msg.timestamp === messageData.timestamp))
         );
         pinButton.classList.remove('pinned');
@@ -1322,90 +1798,90 @@
         pinnedMessages.push(pinnedMsg);
         pinButton.classList.add('pinned');
       }
-      
+
       // Save pinned messages
       localStorage.setItem('pinnedMessages', JSON.stringify(pinnedMessages));
-      
+
       // Update pinned messages display
       updatePinnedMessages();
     }
-    
+
     function updatePinnedMessages() {
       pinnedList.innerHTML = '';
-      
+
       if (pinnedMessages.length === 0) {
         pinCountButton.style.display = 'none';
         return;
       }
-      
+
       // Update pin count and show button
       pinCountButton.textContent = pinnedMessages.length;
       pinCountButton.style.display = 'block';
-      
+
       // Sort pinned messages by timestamp (newest first)
       pinnedMessages.sort((a, b) => b.timestamp - a.timestamp);
-      
+
       // Add each pinned message to the list
       pinnedMessages.forEach(msg => {
         const pinnedItem = document.createElement('div');
         pinnedItem.classList.add('pinned-item');
-        
+
         const pinnedUsername = document.createElement('div');
         pinnedUsername.classList.add('pinned-username');
         pinnedUsername.textContent = msg.username;
-        
+
         const pinnedText = document.createElement('div');
         pinnedText.classList.add('pinned-text');
-        
+
         if (msg.type === 'chat') {
           pinnedText.textContent = msg.message;
         } else if (msg.type === 'file') {
           pinnedText.textContent = `Shared a file: ${msg.fileInfo.originalname}`;
         }
-        
+
         pinnedItem.appendChild(pinnedUsername);
         pinnedItem.appendChild(pinnedText);
-        
+
         // Add click event to navigate to the message
-        pinnedItem.onclick = function() {
+        pinnedItem.onclick = function () {
           navigateToMessage(msg);
         };
-        
+
         pinnedList.appendChild(pinnedItem);
       });
     }
-    
+
     function navigateToMessage(pinnedMsg) {
       // Close the pinned messages panel
       pinnedMessagesContainer.style.display = 'none';
-      
+
       // Try to find the message in the chat
       const messages = messagesContainer.querySelectorAll('.message');
       let targetMessage = null;
-      
+
       for (const message of messages) {
         const messageId = message.getAttribute('data-message-id');
         const timestamp = message.getAttribute('data-timestamp');
         const username = message.querySelector('.message-username').textContent;
         const text = message.querySelector('.message-text').textContent;
-        
-        if (messageId === pinnedMsg.id || 
-            (text.includes(pinnedMsg.message) && username === pinnedMsg.username && timestamp == pinnedMsg.timestamp)) {
+
+        if (messageId === pinnedMsg.id ||
+          (text.includes(pinnedMsg.message) && username === pinnedMsg.username && timestamp == pinnedMsg.timestamp)) {
           targetMessage = message;
           break;
         }
       }
-      
+
       if (targetMessage) {
         // Highlight the message temporarily
         targetMessage.style.backgroundColor = '#ffffa0';
-        
+
         // Scroll to the message
         targetMessage.scrollIntoView({
           behavior: 'smooth',
           block: 'center'
         });
-        
+
         // Remove highlight after a delay
         setTimeout(() => {
           if (targetMessage.classList.contains('sent')) {
@@ -1419,72 +1895,72 @@
         alert('This message is not in the current chat view.');
       }
     }
-    
+
     function addFileMessage(data) {
       // Add date divider if needed
       checkAndAddDateDivider(data.timestamp);
-      
+
       const messageDiv = document.createElement('div');
       messageDiv.classList.add('message');
       messageDiv.classList.add(data.username === username ? 'sent' : 'received');
       messageDiv.setAttribute('data-message-id', data.id || '');
       messageDiv.setAttribute('data-timestamp', data.timestamp || Date.now());
-      
+
       const usernameDiv = document.createElement('div');
       usernameDiv.classList.add('message-username');
       usernameDiv.textContent = data.username;
-      
+
       const textDiv = document.createElement('div');
       textDiv.classList.add('message-text');
       textDiv.textContent = `Shared a file: ${data.fileInfo.originalname}`;
-      
+
       const fileDiv = document.createElement('div');
       fileDiv.classList.add('file-message');
-      
+
       const fileSizeText = formatFileSize(data.fileInfo.size);
       fileDiv.textContent = `${data.fileInfo.originalname} (${fileSizeText})`;
-      
+
       const fileLink = document.createElement('a');
       fileLink.classList.add('file-link');
       fileLink.href = data.fileInfo.path;
       fileLink.target = '_blank';
       fileLink.textContent = 'Download';
       fileLink.download = data.fileInfo.originalname;
-      
+
       fileDiv.appendChild(fileLink);
-      
+
       // Check if the file is an image or video
       const fileExt = data.fileInfo.originalname.split('.').pop().toLowerCase();
       const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
       const videoExts = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
-      
+
       if (imageExts.includes(fileExt)) {
         // Handle image files
         const imagePreview = document.createElement('img');
         imagePreview.classList.add('media-preview');
         imagePreview.src = data.fileInfo.path;
         imagePreview.alt = data.fileInfo.originalname;
-        imagePreview.onclick = function() {
+        imagePreview.onclick = function () {
           openMediaViewer('image', data.fileInfo.path);
         };
-        
+
         fileDiv.appendChild(imagePreview);
       } else if (videoExts.includes(fileExt)) {
         // Handle video files
         const videoPreviewContainer = document.createElement('div');
         videoPreviewContainer.classList.add('media-preview', 'video-thumbnail');
         videoPreviewContainer.style.backgroundImage = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="150" viewBox="0 0 200 150"><rect width="100%" height="100%" fill="%23111"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="14" fill="%23ddd">Video: ${fileExt.toUpperCase()}</text></svg>')`;
-        videoPreviewContainer.onclick = function() {
+        videoPreviewContainer.onclick = function () {
           openMediaViewer('video', data.fileInfo.path);
         };
-        
+
         // Try to create a video thumbnail 
         const videoElement = document.createElement('video');
         videoElement.src = data.fileInfo.path;
         videoElement.muted = true;
         videoElement.preload = "metadata";
-        
-        videoElement.addEventListener('loadedmetadata', function() {
+
+        videoElement.addEventListener('loadedmetadata', function () {
           try {
             // Wait a bit to let the video load enough frames
             videoElement.currentTime = 1;
@@ -1492,8 +1968,8 @@
             console.error('Error setting video time:', e);
           }
         });
-        
-        videoElement.addEventListener('seeked', function() {
+
+        videoElement.addEventListener('seeked', function () {
           try {
             // Create a canvas and draw the video frame
             const canvas = document.createElement('canvas');
@@ -1501,7 +1977,7 @@
             canvas.height = videoElement.videoHeight;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-            
+
             // Use the canvas data as the thumbnail background
             const thumbnailUrl = canvas.toDataURL();
             videoPreviewContainer.style.backgroundImage = `url('${thumbnailUrl}')`;
@@ -1509,25 +1985,25 @@
             console.error('Error creating thumbnail:', e);
           }
         });
-        
+
         // Add error handling
-        videoElement.addEventListener('error', function(e) {
+        videoElement.addEventListener('error', function (e) {
           console.error('Video thumbnail generation error:', e);
         });
-        
+
         fileDiv.appendChild(videoPreviewContainer);
       }
-      
+
       const timeDiv = document.createElement('div');
       timeDiv.classList.add('message-time');
       timeDiv.textContent = formatTime(data.timestamp);
-      
+
       // Add pin button
       const pinButton = document.createElement('div');
       pinButton.classList.add('pin-button');
       pinButton.innerHTML = '📌';
       pinButton.setAttribute('title', 'Pin this message');
-      pinButton.onclick = function(e) {
+      pinButton.onclick = function (e) {
         e.stopPropagation();
         togglePin(messageDiv, {
           id: data.id,
@@ -1538,117 +2014,117 @@
           fileInfo: data.fileInfo
         });
       };
-      
+
       // Check if message is already pinned
-      const isPinned = pinnedMessages.some(msg => 
-        msg.id === data.id || 
-        (msg.type === 'file' && msg.fileInfo.originalname === data.fileInfo.originalname && 
-         msg.username === data.username && msg.timestamp === data.timestamp)
+      const isPinned = pinnedMessages.some(msg =>
+        msg.id === data.id ||
+        (msg.type === 'file' && msg.fileInfo.originalname === data.fileInfo.originalname &&
+          msg.username === data.username && msg.timestamp === data.timestamp)
       );
-      
+
       if (isPinned) {
         pinButton.classList.add('pinned');
       }
-      
+
       messageDiv.appendChild(pinButton);
       messageDiv.appendChild(usernameDiv);
       messageDiv.appendChild(textDiv);
       messageDiv.appendChild(fileDiv);
       messageDiv.appendChild(timeDiv);
-      
+
       messagesContainer.appendChild(messageDiv);
       scrollToBottom();
     }
-    
+
     function addSystemMessage(message) {
       const messageDiv = document.createElement('div');
       messageDiv.classList.add('system-message');
       messageDiv.textContent = message;
-      
+
       messagesContainer.appendChild(messageDiv);
       scrollToBottom();
     }
-    
+
     function checkAndAddDateDivider(timestamp) {
       const messageDate = new Date(timestamp).toLocaleDateString();
-      
+
       if (!lastMessageDate || lastMessageDate !== messageDate) {
         const divider = document.createElement('div');
         divider.classList.add('date-divider');
-        
+
         const dateSpan = document.createElement('span');
         dateSpan.textContent = messageDate;
-        
+
         divider.appendChild(dateSpan);
         messagesContainer.appendChild(divider);
-        
+
         lastMessageDate = messageDate;
       }
     }
-    
+
     function updateUsersList(users = []) {
       usersList.innerHTML = '';
-      
+
       if (username && !users.includes(username)) {
         users.push(username);
       }
-      
+
       users.forEach(user => {
         const userItem = document.createElement('div');
         userItem.classList.add('user-item');
-        
+
         const statusDot = document.createElement('div');
         statusDot.classList.add('user-status');
-        
+
         const userName = document.createElement('span');
         userName.textContent = user === username ? `${user} (You)` : user;
-        
+
         userItem.appendChild(statusDot);
         userItem.appendChild(userName);
         usersList.appendChild(userItem);
       });
     }
-    
+
     function uploadFile() {
       if (!username || !fileInput.files.length) return;
-      
+
       const file = fileInput.files[0];
       const formData = new FormData();
       formData.append('file', file);
       formData.append('username', username);
-      
+
       // Show uploading indicator
       addSystemMessage(`Uploading ${file.name}...`);
-      
+
       fetch('/upload', {
         method: 'POST',
         body: formData
       })
-      .then(response => response.json())
-      .then(data => {
-        if (!data.success) {
-          addSystemMessage('Failed to upload file.');
-        }
-        // Reset file input
-        fileInput.value = '';
-      })
-      .catch(error => {
-        console.error('Error uploading file:', error);
-        addSystemMessage('Error uploading file.');
-        fileInput.value = '';
-      });
+        .then(response => response.json())
+        .then(data => {
+          if (!data.success) {
+            addSystemMessage('Failed to upload file.');
+          }
+          // Reset file input
+          fileInput.value = '';
+        })
+        .catch(error => {
+          console.error('Error uploading file:', error);
+          addSystemMessage('Error uploading file.');
+          fileInput.value = '';
+        });
     }
-    
+
     function formatFileSize(bytes) {
       if (bytes < 1024) return bytes + ' bytes';
       if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
       return (bytes / 1048576).toFixed(1) + ' MB';
     }
-    
+
     function formatTime(timestamp) {
       return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
-    
+
     function scrollToBottom() {
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
@@ -1659,16 +2135,16 @@
     function handleDragOver(e) {
       e.preventDefault();
       dragCounter++;
-      if(!document.body.classList.contains('body-dragover')) {
+      if (!document.body.classList.contains('body-dragover')) {
         document.body.classList.add('body-dragover');
       }
     }
 
     function handleDragLeave(e) {
       dragCounter--;
-      
+
       document.body.classList.remove('body-dragover');
-      
+
     }
 
     function handleDrop(e) {
@@ -1685,14 +2161,14 @@
       if (files.length > 0) {
         // Handle only the first file
         const file = files[0];
-        
+
         // Create a new DataTransfer object and add the file
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(file);
-        
+
         // Assign the DataTransfer files to the file input
         fileInput.files = dataTransfer.files;
-        
+
         // Trigger the change event
         const event = new Event('change');
         fileInput.dispatchEvent(event);
@@ -1705,7 +2181,7 @@
     document.body.addEventListener('drop', handleDrop);
 
     // Add media viewer functionality at the end of the script
-    
+
     // Media viewer elements
     const mediaModal = document.getElementById('mediaModal');
     const modalImage = document.getElementById('modalImage');
@@ -1713,33 +2189,33 @@
     const videoContainer = document.getElementById('videoContainer');
     const closeModal = document.getElementById('closeModal');
     const imageControls = document.getElementById('imageControls');
-    
+
     // Image controls
     const zoomIn = document.getElementById('zoomIn');
     const zoomOut = document.getElementById('zoomOut');
     const zoomReset = document.getElementById('zoomReset');
-    
+
     let currentZoom = 1;
     let currentRotation = 0;
-    
+
     function openMediaViewer(type, mediaSrc) {
       // Reset all transformations
       currentZoom = 1;
       currentRotation = 0;
       translateX = 0;
       translateY = 0;
-      
+
       // Hide all media elements first
       modalImage.style.display = 'none';
       imageControls.style.display = 'none';
       videoContainer.style.display = 'none';
-      
+
       // Show the modal
       mediaModal.style.display = 'flex';
-      
+
       if (type === 'image') {
         // Show image viewer
-        modalImage.onload = function() {
+        modalImage.onload = function () {
           modalImage.style.display = 'block';
           imageControls.style.display = 'flex';
           updateImageTransform();
@@ -1750,7 +2226,7 @@
         modalVideo.src = mediaSrc;
         videoContainer.style.display = 'block';
         modalVideo.load();
-        
+
         setTimeout(() => {
           const playPromise = modalVideo.play();
           if (playPromise !== undefined) {
@@ -1761,12 +2237,12 @@
         }, 100);
       }
     }
-    
+
     // Function to update image transform
     function updateImageTransform() {
       if (modalImage) {
         modalImage.style.transform = `rotate(${currentRotation}deg) scale(${currentZoom}) translate(${translateX}px, ${translateY}px)`;
-        
+
         // Adjust dragging based on rotation
         if (currentRotation % 180 !== 0) {
           modalImage.style.maxWidth = '90vh';
@@ -1783,7 +2259,7 @@
     let startX, startY;
     let initialTranslateX, initialTranslateY;
 
-    modalImage.addEventListener('mousedown', function(e) {
+    modalImage.addEventListener('mousedown', function (e) {
       if (currentZoom > 1) {
         isDragging = true;
         startX = e.clientX;
@@ -1795,21 +2271,21 @@
       }
     });
 
-    document.addEventListener('mousemove', function(e) {
+    document.addEventListener('mousemove', function (e) {
       if (isDragging) {
         const dx = e.clientX - startX;
         const dy = e.clientY - startY;
-        
+
         // Adjust translation based on rotation
         const angle = currentRotation * Math.PI / 180;
         translateX = initialTranslateX + (dx * Math.cos(angle) + dy * Math.sin(angle)) / currentZoom;
         translateY = initialTranslateY + (-dx * Math.sin(angle) + dy * Math.cos(angle)) / currentZoom;
-        
+
         updateImageTransform();
       }
     });
 
-    document.addEventListener('mouseup', function() {
+    document.addEventListener('mouseup', function () {
       if (isDragging) {
         isDragging = false;
         modalImage.style.cursor = 'move';
@@ -1817,17 +2293,17 @@
     });
 
     // Enhanced zoom controls
-    zoomIn.onclick = function() {
+    zoomIn.onclick = function () {
       currentZoom = Math.min(currentZoom + 0.2, 5);
       updateImageTransform();
     };
 
-    zoomOut.onclick = function() {
+    zoomOut.onclick = function () {
       currentZoom = Math.max(currentZoom - 0.2, 0.5);
       updateImageTransform();
     };
 
-    zoomReset.onclick = function() {
+    zoomReset.onclick = function () {
       currentZoom = 1;
       currentRotation = 0;
       translateX = 0;
@@ -1836,29 +2312,29 @@
     };
 
     // Add wheel zoom support
-    mediaModal.addEventListener('wheel', function(e) {
+    mediaModal.addEventListener('wheel', function (e) {
       if (modalImage.style.display === 'block') {
         e.preventDefault();
         const delta = e.deltaY * -0.01;
         const newZoom = Math.max(0.5, Math.min(5, currentZoom + delta));
-        
+
         // Calculate cursor position relative to image
         const rect = modalImage.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        
+
         // Calculate new position to zoom towards cursor
         const scale = newZoom / currentZoom;
         translateX = x - (x - translateX) * scale;
         translateY = y - (y - translateY) * scale;
-        
+
         currentZoom = newZoom;
         updateImageTransform();
       }
     });
 
     // Close modal when clicking outside
-    mediaModal.onclick = function(event) {
+    mediaModal.onclick = function (event) {
       if (event.target === mediaModal) {
         mediaModal.style.display = 'none';
         modalVideo.pause();
@@ -1867,7 +2343,7 @@
     };
 
     // Close on escape key
-    document.addEventListener('keydown', function(event) {
+    document.addEventListener('keydown', function (event) {
       if (event.key === 'Escape' && mediaModal.style.display === 'block') {
         mediaModal.style.display = 'none';
         modalVideo.pause();
@@ -1900,10 +2376,10 @@
     // Function to perform the search
     function performSearch() {
       const searchTerm = searchInput.value.toLowerCase().trim();
-      
+
       // Clear previous highlights
       clearHighlights();
-      
+
       if (searchTerm === '') {
         currentSearchResults = [];
         currentMatchIndex = -1;
@@ -1952,7 +2428,7 @@
       if (currentMatchIndex >= 0 && currentSearchResults.length > 0) {
         const currentMatch = currentSearchResults[currentMatchIndex];
         currentMatch.classList.add('current-match');
-        
+
         // Scroll the current match into view
         currentMatch.scrollIntoView({
           behavior: 'smooth',
@@ -2007,7 +2483,7 @@
 
     // Add search functionality to new messages
     const originalAddMessage = addMessage;
-    addMessage = function(data) {
+    addMessage = function (data) {
       originalAddMessage(data);
       if (searchInput.value.trim() !== '') {
         performSearch();
@@ -2015,14 +2491,14 @@
     };
 
     // Add event listeners for pinned messages
-    pinCountButton.addEventListener('click', function() {
+    pinCountButton.addEventListener('click', function () {
       pinnedMessagesContainer.style.display = 'block';
     });
-    
-    closePinned.addEventListener('click', function() {
+
+    closePinned.addEventListener('click', function () {
       pinnedMessagesContainer.style.display = 'none';
     });
-    
+
     // Initialize pinned messages on load
     updatePinnedMessages();
 
@@ -2080,7 +2556,7 @@
       } else {
         let text = '';
         const usersArray = Array.from(typingUsers);
-        
+
         if (usersArray.length === 1) {
           text = `${usersArray[0]} is typing...`;
         } else if (usersArray.length === 2) {
@@ -2090,7 +2566,7 @@
         } else {
           text = `${usersArray.length} people are typing...`;
         }
-        
+
         typingIndicator.textContent = text;
         typingIndicator.style.display = 'flex';
       }
@@ -2169,7 +2645,7 @@
     // Mobile search buttons
     const mobileSearchPrev = document.getElementById('mobileSearchPrev');
     const mobileSearchNext = document.getElementById('mobileSearchNext');
-    
+
     if (mobileSearchPrev) {
       mobileSearchPrev.addEventListener('click', () => {
         // Trigger previous search function
@@ -2177,7 +2653,7 @@
         if (searchPrev) searchPrev.click();
       });
     }
-    
+
     if (mobileSearchNext) {
       mobileSearchNext.addEventListener('click', () => {
         // Trigger next search function
@@ -2187,4 +2663,5 @@
     }
   </script>
 </body>
+
 </html>
