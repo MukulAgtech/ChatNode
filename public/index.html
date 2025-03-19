@@ -1237,7 +1237,7 @@
         messageInput.value = '';
         // Clear typing status
         typing = false;
-        socket.emit('stop-typing');
+        socket.emit('stop-typing', username);
       }
     }
     
@@ -2026,11 +2026,12 @@
     // Initialize pinned messages on load
     updatePinnedMessages();
 
-    // Add typing indicator element
+    // Add typing indicator functionality
     const typingIndicator = document.getElementById('typingIndicator');
     const TYPING_TIMER_LENGTH = 3000; // 3 seconds
     let typing = false;
     let lastTypingTime;
+    let typingUsers = new Set(); // Track who is typing
 
     // Add typing event listeners to message input
     messageInput.addEventListener('input', () => {
@@ -2045,7 +2046,7 @@
     function updateTyping() {
       if (!typing) {
         typing = true;
-        socket.emit('typing');
+        socket.emit('typing', username);
       }
       lastTypingTime = new Date().getTime();
 
@@ -2053,7 +2054,7 @@
         const timeNow = new Date().getTime();
         const timeDiff = timeNow - lastTypingTime;
         if (timeDiff >= TYPING_TIMER_LENGTH && typing) {
-          socket.emit('stop-typing');
+          socket.emit('stop-typing', username);
           typing = false;
         }
       }, TYPING_TIMER_LENGTH);
@@ -2062,20 +2063,42 @@
     // Socket events for typing indicators
     socket.on('typing', (user) => {
       if (user !== username) {
-        typingIndicator.textContent = `${user} is typing...`;
-        typingIndicator.style.display = 'flex';
+        typingUsers.add(user);
+        updateTypingIndicator();
       }
     });
 
-    socket.on('stop typing', (user) => {
-      if (user !== username) {
-        typingIndicator.style.display = 'none';
-      }
+    socket.on('stop-typing', (user) => {
+      typingUsers.delete(user);
+      updateTypingIndicator();
     });
+
+    // Update the typing indicator display
+    function updateTypingIndicator() {
+      if (typingUsers.size === 0) {
+        typingIndicator.style.display = 'none';
+      } else {
+        let text = '';
+        const usersArray = Array.from(typingUsers);
+        
+        if (usersArray.length === 1) {
+          text = `${usersArray[0]} is typing...`;
+        } else if (usersArray.length === 2) {
+          text = `${usersArray[0]} and ${usersArray[1]} are typing...`;
+        } else if (usersArray.length === 3) {
+          text = `${usersArray[0]}, ${usersArray[1]} and ${usersArray[2]} are typing...`;
+        } else {
+          text = `${usersArray.length} people are typing...`;
+        }
+        
+        typingIndicator.textContent = text;
+        typingIndicator.style.display = 'flex';
+      }
+    }
 
     // Add cleanup when user leaves
     window.addEventListener('beforeunload', () => {
-      socket.emit('stop typing', username);
+      socket.emit('stop-typing', username);
     });
 
     // Add hamburger menu functionality

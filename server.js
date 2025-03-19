@@ -179,18 +179,12 @@ io.on('connection', (socket) => {
     io.emit('chat-message', messageObj);
   });
 
-  socket.on('typing', () => {
-    const username = users[socket.id];
-    if (username) {
-      socket.broadcast.emit('typing', username);
-    }
+  socket.on('typing', (username) => {
+    socket.broadcast.emit('typing', username);
   });
 
-  socket.on('stop-typing', () => {
-    const username = users[socket.id];
-    if (username) {
-      socket.broadcast.emit('stop typing', username);
-    }
+  socket.on('stop-typing', (username) => {
+    socket.broadcast.emit('stop-typing', username);
   });
 
   // Handle disconnection
