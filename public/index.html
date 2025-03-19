@@ -1320,12 +1320,85 @@
       }
     }
 
+   
+    /*
+    To use the formatting in your addMessage function, modify it like this:
+
+    function addMessage(data) {
+      // Create message container div
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message');
+      // Other class assignments...
+      
+      // Create username div
+      const usernameDiv = document.createElement('div');
+      usernameDiv.classList.add('message-username');
+      usernameDiv.textContent = data.username;
+      
+      // Create text div with formatting
+      const textDiv = document.createElement('div');
+      textDiv.classList.add('message-text');
+      textDiv.innerHTML = formatMessage(data.message); // Use innerHTML with formatMessage
+      
+      // Append elements
+      messageDiv.appendChild(usernameDiv);
+      messageDiv.appendChild(textDiv);
+      // Other elements...
+      
+      // Add to messages container
+      messagesContainer.appendChild(messageDiv);
+      // Scroll logic...
+    }
+    */
+  </style>
+
+  <script>
+    // Instructions for adjusting your addMessage function:
+    /*
+    To use the formatting in your addMessage function, modify it like this:
+
+    function addMessage(data) {
+      // Create message container div
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message');
+      // Other class assignments...
+      
+      // Create username div
+      const usernameDiv = document.createElement('div');
+      usernameDiv.classList.add('message-username');
+      usernameDiv.textContent = data.username;
+      
+      // Create text div with formatting
+      const textDiv = document.createElement('div');
+      textDiv.classList.add('message-text');
+      textDiv.innerHTML = formatMessage(data.message); // Use innerHTML with formatMessage
+      
+      // Append elements
+      messageDiv.appendChild(usernameDiv);
+      messageDiv.appendChild(textDiv);
+      // Other elements...
+      
+      // Add to messages container
+      messagesContainer.appendChild(messageDiv);
+      // Scroll logic...
+    }
+    */
+
     /* Text formatting functionality */
     function formatMessage(text) {
       if (!text) return '';
       
+      // Safely escape HTML first to prevent XSS
+      const escapeHtml = (str) => {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      };
+      
+      let formattedText = escapeHtml(text);
+      
       // Replace line breaks
-      let formattedText = text.replace(/\n/g, '<br>');
+      formattedText = formattedText.replace(/\n/g, '<br>');
       
       // Bold: **text** or __text__
       formattedText = formattedText.replace(/(\*\*|__)(.*?)\1/g, '<strong>$2</strong>');
@@ -1340,141 +1413,19 @@
       formattedText = formattedText.replace(/`(.*?)`/g, '<code>$1</code>');
       
       // Links: [text](url)
-      formattedText = formattedText.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+      formattedText = formattedText.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(match, text, url) {
+        // Simple URL validation
+        if (!/^https?:\/\//i.test(url)) {
+          url = 'https://' + url;
+        }
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+      });
       
       return formattedText;
     }
 
-    /* Handle shift+enter for new line */
-    messageInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        if (e.shiftKey) {
-          // Insert new line instead of sending
-          e.preventDefault();
-          const cursorPos = messageInput.selectionStart;
-          const text = messageInput.value;
-          messageInput.value = text.substring(0, cursorPos) + '\n' + text.substring(cursorPos);
-          
-          // Move cursor position after the inserted new line
-          setTimeout(() => {
-            messageInput.selectionStart = messageInput.selectionEnd = cursorPos + 1;
-          }, 0);
-        } else {
-          // Regular Enter key sends the message
-          e.preventDefault();
-          sendMessage();
-        }
-      }
-    });
-
-    /* Add CSS for formatted text */
-    const style = document.createElement('style');
-    style.textContent = `
-      .message-text {
-        white-space: pre-wrap;
-        word-break: break-word;
-      }
-      .message-text strong {
-        font-weight: bold;
-      }
-      .message-text em {
-        font-style: italic;
-      }
-      .message-text del {
-        text-decoration: line-through;
-      }
-      .message-text code {
-        font-family: monospace;
-        background-color: rgba(0, 0, 0, 0.1);
-        padding: 2px 4px;
-        border-radius: 3px;
-        font-size: 0.9em;
-      }
-      .message-text a {
-        color: #3498db;
-        text-decoration: underline;
-      }
-      .formatting-help {
-        position: absolute;
-        right: 10px;
-        bottom: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        color: white;
-        padding: 10px;
-        border-radius: 5px;
-        font-size: 12px;
-        display: none;
-        z-index: 100;
-      }
-      .formatting-help-button {
-        position: absolute;
-        right: 10px;
-        top: 10px;
-        color: #999;
-        cursor: pointer;
-        font-size: 16px;
-      }
-      .formatting-help table {
-        border-collapse: collapse;
-      }
-      .formatting-help td {
-        padding: 4px 8px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      }
-      .formatting-help code {
-        background: rgba(255, 255, 255, 0.2);
-        padding: 1px 3px;
-        border-radius: 3px;
-      }
-    `;
-    document.head.appendChild(style);
-
-    /* Modify the addMessage function to use formatted text */
-    function addMessage(data) {
-      // ... existing code ...
-      
-      const textDiv = document.createElement('div');
-      textDiv.classList.add('message-text');
-      textDiv.innerHTML = formatMessage(data.message); // Use innerHTML instead of textContent
-      
-      // ... rest of existing code ...
-    }
-
-    /* Add formatting help button and panel */
-    const inputArea = document.querySelector('.input-area');
-    const helpButton = document.createElement('div');
-    helpButton.classList.add('formatting-help-button');
-    helpButton.textContent = '?';
-    helpButton.title = 'Formatting Help';
-
-    const helpPanel = document.createElement('div');
-    helpPanel.classList.add('formatting-help');
-    helpPanel.innerHTML = `
-      <h4>Text Formatting</h4>
-      <table>
-        <tr><td><code>**bold**</code></td><td>→</td><td><strong>bold</strong></td></tr>
-        <tr><td><code>*italic*</code></td><td>→</td><td><em>italic</em></td></tr>
-        <tr><td><code>~~strike~~</code></td><td>→</td><td><del>strike</del></td></tr>
-        <tr><td><code>\`code\`</code></td><td>→</td><td><code>code</code></td></tr>
-        <tr><td><code>[link](url)</code></td><td>→</td><td><a href="#">link</a></td></tr>
-        <tr><td>Shift+Enter</td><td>→</td><td>New line</td></tr>
-      </table>
-    `;
-
-    inputArea.appendChild(helpButton);
-    inputArea.appendChild(helpPanel);
-
-    helpButton.addEventListener('click', () => {
-      helpPanel.style.display = helpPanel.style.display === 'block' ? 'none' : 'block';
-    });
-
-    /* Click outside to close help panel */
-    document.addEventListener('click', (e) => {
-      if (e.target !== helpButton && !helpPanel.contains(e.target)) {
-        helpPanel.style.display = 'none';
-      }
-    });
-  </style>
+    // ... rest of the JavaScript code ...
+  </script>
 </head>
 
 <body>
