@@ -4,7 +4,7 @@
   "description": "A local messaging app for LAN with file transfer support and data persistence",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node --env-file=.env server.js",
     "dev": "nodemon server.js"
   },
   "dependencies": {

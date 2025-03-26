@@ -1471,7 +1471,7 @@
         <input type="text" class="message-input" id="messageInput" placeholder="Type a message...">
         <label class="file-button">
           File
-          <input type="file" class="file-input" id="fileInput">
+          <input type="file" class="file-input" id="fileInput" multiple>
         </label>
         <button class="send-button" id="sendButton">Send</button>
       </div>
@@ -2039,13 +2039,16 @@
     function uploadFile() {
       if (!username || !fileInput.files.length) return;
 
-      const file = fileInput.files[0];
+      const files = fileInput.files;
       const formData = new FormData();
-      formData.append('file', file);
+      // Append all files
+      for (let i = 0; i < files.length; i++) {
+        formData.append('files', files[i]);
+      }
       formData.append('username', username);
 
       // Show uploading indicator
-      addSystemMessage(`Uploading ${file.name}...`);
+      addSystemMessage(`Uploading ${files.length} file${files.length > 1 ? 's' : ''}...`);
 
       fetch('/upload', {
         method: 'POST',
@@ -2111,11 +2114,13 @@
       const files = e.dataTransfer.files;
       if (files.length > 0) {
         // Handle only the first file
-        const file = files[0];
+        // const file = files[0];
 
         // Create a new DataTransfer object and add the file
         const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(file);
+        for (let i = 0; i < files.length; i++) {
+          dataTransfer.items.add(files[i]);
+        }
 
         // Assign the DataTransfer files to the file input
         fileInput.files = dataTransfer.files;
@@ -2551,19 +2556,20 @@
     // Mobile sidebar overlay functionality
     const mobileOverlay = document.getElementById('mobileOverlay');
     const mobileMenuPanel = document.getElementById('mobileMenuPanel');
-    const mobileSearchInput = document.getElementById('mobileSearchInput');
+    // const mobileSearchInput = document.getElementById('mobileSearchInput');
     const mobileUsersList = document.getElementById('mobileUsersList');
-    const closeMenu = document.getElementById('closeMenu');
+    const sidebar = document.getElementsByClassName('sidebar')[0];
+    // const closeMenu = document.getElementById('closeMenu');
 
     hamburgerMenu.addEventListener('click', () => {
       mobileOverlay.classList.toggle('active');
       mobileMenuPanel.classList.toggle('active');
     });
 
-    closeMenu.addEventListener('click', () => {
-      mobileOverlay.classList.remove('active');
-      mobileMenuPanel.classList.remove('active');
-    });
+    // closeMenu.addEventListener('click', () => {
+    //   mobileOverlay.classList.remove('active');
+    //   mobileMenuPanel.classList.remove('active');
+    // });
 
     // Close when clicking overlay
     mobileOverlay.addEventListener('click', () => {
@@ -2583,35 +2589,35 @@
     }
 
     // Sync search inputs
-    mobileSearchInput.addEventListener('input', () => {
-      searchInput.value = mobileSearchInput.value;
-      // If you have a search function, call it here
-    });
+    // mobileSearchInput.addEventListener('input', () => {
+    //   searchInput.value = mobileSearchInput.value;
+    //   // If you have a search function, call it here
+    // });
 
-    searchInput.addEventListener('input', () => {
-      mobileSearchInput.value = searchInput.value;
-      // If you have a search function, call it here
-    });
+    // searchInput.addEventListener('input', () => {
+    //   mobileSearchInput.value = searchInput.value;
+    //   // If you have a search function, call it here
+    // });
 
     // Mobile search buttons
-    const mobileSearchPrev = document.getElementById('mobileSearchPrev');
-    const mobileSearchNext = document.getElementById('mobileSearchNext');
+    // const mobileSearchPrev = document.getElementById('mobileSearchPrev');
+    // const mobileSearchNext = document.getElementById('mobileSearchNext');
 
-    if (mobileSearchPrev) {
-      mobileSearchPrev.addEventListener('click', () => {
-        // Trigger previous search function
-        const searchPrev = document.getElementById('searchPrev');
-        if (searchPrev) searchPrev.click();
-      });
-    }
+    // if (mobileSearchPrev) {
+    //   mobileSearchPrev.addEventListener('click', () => {
+    //     // Trigger previous search function
+    //     const searchPrev = document.getElementById('searchPrev');
+    //     if (searchPrev) searchPrev.click();
+    //   });
+    // }
 
-    if (mobileSearchNext) {
-      mobileSearchNext.addEventListener('click', () => {
-        // Trigger next search function
-        const searchNext = document.getElementById('searchNext');
-        if (searchNext) searchNext.click();
-      });
-    }
+    // if (mobileSearchNext) {
+    //   mobileSearchNext.addEventListener('click', () => {
+    //     // Trigger next search function
+    //     const searchNext = document.getElementById('searchNext');
+    //     if (searchNext) searchNext.click();
+    //   });
+    // }
   </script>
 </body>
 

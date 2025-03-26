@@ -89,32 +89,35 @@ app.get('/api/messages', (req, res) => {
 });
 
 // Handle file uploads
-app.post('/upload', upload.single('file'), (req, res) => {
-  if (req.file) {
-    const fileInfo = {
-      id: uuidv4(),
-      filename: req.file.filename,
-      originalname: req.file.originalname,
-      path: `/uploads/${req.file.filename}`,
-      size: req.file.size,
-      mimetype: req.file.mimetype
-    };
+app.post('/upload', upload.array('files'), (req, res) => {
+  if (req.files && req.files.length > 0) {
+    const uploadedFiles = [];
+    req.files.forEach((file) => {
+      const fileInfo = {
+        id: uuidv4(),
+        filename: file.filename,
+        originalname: file.originalname,
+        path: `/uploads/${file.filename}`,
+        size: file.size,
+        mimetype: file.mimetype
+      };
 
-    // Create a new message for the file
-    const fileMessage = {
-      id: uuidv4(),
-      type: 'file',
-      username: req.body.username,
-      fileInfo: fileInfo,
-      timestamp: new Date().toISOString()
-    };
+      // Create a new message for each file
+      const fileMessage = {
+        id: uuidv4(),
+        type: 'file',
+        username: req.body.username,
+        fileInfo: fileInfo,
+        timestamp: new Date().toISOString()
+      };
 
-    // Save to message history and notify clients
-    messages.push(fileMessage);
+      // Save and notify
+      messages.push(fileMessage);
+      io.emit('new-file', fileMessage);
+      uploadedFiles.push(fileInfo);
+    });
     saveMessages();
-    io.emit('new-file', fileMessage);
-    
-    res.json({ success: true, fileInfo });
+    res.json({ success: true, fileInfos: uploadedFiles });
   } else {
     res.status(400).json({ success: false, message: 'No file uploaded' });
   }
@@ -154,6 +157,10 @@ io.on('connection', (socket) => {
     
     // Send message history to new user
     socket.emit('message-history', messages.slice(-50)); // Send last 50 messages
+    // if(clientIp == "192.168.x.x"){
+    //   console.log(socket.id);
+    //   io.sockets.sockets.get(socket.id).disconnect(true);
+    // }
   });
 
   // Add this new handler for get-users
@@ -171,6 +178,7 @@ io.on('connection', (socket) => {
       type: 'chat',
       username: username,
       message: message,
+      socketId : socket.id,
       timestamp: new Date().toISOString()
     };
     
